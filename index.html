@@ -2,385 +2,442 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>FreeFlix - Stream Your Sources</title>
+    <title>FreeFlix</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap");
 
       :root {
         --red: #e50914;
         --red-dark: #b20710;
-        --red-light: #f74c42;
-        --bg: #080808;
-        --surface: #111111;
-        --surface2: #1a1a1a;
-        --border: rgba(229, 9, 20, 0.18);
-        --text: #f0f0f0;
-        --text-muted: #555;
+        --red-glow: rgba(229,9,20,0.25);
+        --bg: #070707;
+        --surface: #111;
+        --surface2: #181818;
+        --surface3: #202020;
+        --border: rgba(255,255,255,0.06);
+        --border-red: rgba(229,9,20,0.2);
+        --text: #efefef;
+        --text-dim: #888;
+        --text-muted: #444;
+        --gold: #f5c518;
       }
 
       *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html { scroll-behavior: smooth; }
 
       body {
         font-family: 'DM Sans', sans-serif;
         background: var(--bg);
         color: var(--text);
         overflow-x: hidden;
+        min-height: 100vh;
       }
 
-      body::before {
-        content: '';
-        position: fixed;
-        inset: 0;
+      /* Ambient light */
+      #ambient {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
         background:
-          radial-gradient(ellipse 80% 50% at 10% 20%, rgba(229,9,20,0.06) 0%, transparent 60%),
-          radial-gradient(ellipse 60% 40% at 90% 80%, rgba(229,9,20,0.04) 0%, transparent 60%);
-        pointer-events: none;
-        z-index: 0;
+          radial-gradient(ellipse 70% 40% at 15% 15%, rgba(229,9,20,0.07) 0%, transparent 70%),
+          radial-gradient(ellipse 50% 30% at 85% 85%, rgba(229,9,20,0.04) 0%, transparent 70%);
       }
 
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-track { background: var(--bg); }
-      ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 3px; }
+      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 99px; }
 
-      /* ── HEADER ── */
-      .header {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        z-index: 100;
-        background: linear-gradient(180deg, rgba(8,8,8,0.98) 0%, rgba(8,8,8,0.9) 100%);
-        backdrop-filter: blur(20px);
+      /* ─── HEADER ─── */
+      #header {
+        position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+        background: rgba(7,7,7,0.92);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
         border-bottom: 1px solid var(--border);
-        padding: 14px 24px;
       }
 
-      .header-inner { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+      .header-inner {
+        max-width: 1440px; margin: 0 auto;
+        padding: 14px 24px;
+        display: flex; flex-direction: column; gap: 11px;
+      }
 
       .header-top { display: flex; align-items: center; justify-content: space-between; }
 
       .logo {
         font-family: 'Bebas Neue', sans-serif;
-        font-size: 2rem;
-        letter-spacing: 4px;
+        font-size: 1.85rem;
+        letter-spacing: 5px;
         line-height: 1;
-        text-decoration: none;
+        user-select: none;
       }
-      .logo .r { color: var(--red); }
-      .logo .w { color: var(--text); }
+      .logo-red { color: var(--red); }
+      .logo-white { color: #fff; }
 
-      .stats-pill {
-        font-size: 0.68rem;
-        font-weight: 600;
+      .header-right { display: flex; align-items: center; gap: 10px; }
+
+      .pill {
+        font-size: 0.65rem; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 1.5px;
         color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        border: 1px solid rgba(255,255,255,0.07);
-        padding: 5px 12px;
-        border-radius: 20px;
-        background: rgba(255,255,255,0.03);
+        border: 1px solid var(--border);
+        padding: 4px 11px; border-radius: 99px;
+        background: rgba(255,255,255,0.02);
       }
 
+      /* Search */
       .search-wrap { position: relative; }
       .search-input {
         width: 100%;
-        background: var(--surface);
-        border: 1px solid rgba(255,255,255,0.07);
+        background: var(--surface2);
+        border: 1px solid var(--border);
         border-radius: 10px;
-        padding: 11px 42px 11px 15px;
+        padding: 10px 40px 10px 14px;
         color: var(--text);
         font-family: 'DM Sans', sans-serif;
         font-size: 0.875rem;
-        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
       }
       .search-input::placeholder { color: var(--text-muted); }
       .search-input:focus {
-        border-color: var(--red);
-        box-shadow: 0 0 0 3px rgba(229,9,20,0.1);
-        background: var(--surface2);
+        border-color: rgba(229,9,20,0.5);
+        box-shadow: 0 0 0 3px rgba(229,9,20,0.08);
+        background: var(--surface3);
       }
       .search-icon {
-        position: absolute;
-        right: 13px; top: 50%;
+        position: absolute; right: 12px; top: 50%;
         transform: translateY(-50%);
-        color: var(--text-muted);
-        pointer-events: none;
+        color: var(--text-muted); pointer-events: none;
       }
 
-      .filters {
-        display: flex;
-        gap: 6px;
-        overflow-x: auto;
-        padding-bottom: 2px;
+      /* Filter bar */
+      .filter-bar {
+        display: flex; gap: 5px;
+        overflow-x: auto; padding-bottom: 1px;
         scrollbar-width: none;
       }
-      .filters::-webkit-scrollbar { display: none; }
+      .filter-bar::-webkit-scrollbar { display: none; }
 
-      .filter-sep { width: 1px; background: rgba(255,255,255,0.07); flex-shrink: 0; margin: 0 2px; }
+      .fsep {
+        width: 1px; flex-shrink: 0; margin: 0 3px;
+        background: rgba(255,255,255,0.06);
+        align-self: stretch;
+      }
 
-      .filter-btn {
+      .fbtn {
         flex-shrink: 0;
-        padding: 6px 14px;
-        border-radius: 7px;
+        padding: 5px 13px;
+        border-radius: 6px;
         font-family: 'DM Sans', sans-serif;
-        font-size: 0.78rem;
-        font-weight: 600;
-        border: 1px solid rgba(255,255,255,0.07);
-        background: var(--surface);
-        color: var(--text-muted);
+        font-size: 0.75rem; font-weight: 600;
+        border: 1px solid var(--border);
+        background: var(--surface2);
+        color: var(--text-dim);
         cursor: pointer;
-        transition: all 0.18s ease;
+        transition: all 0.15s ease;
         white-space: nowrap;
       }
-      .filter-btn:hover { border-color: rgba(229,9,20,0.4); color: var(--text); background: var(--surface2); }
-      .filter-btn.active { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 3px 12px rgba(229,9,20,0.3); }
+      .fbtn:hover { border-color: var(--border-red); color: var(--text); background: var(--surface3); }
+      .fbtn.on { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 2px 12px var(--red-glow); }
 
-      /* ── GRID ── */
-      .main {
-        position: relative;
-        z-index: 1;
-        padding: 0 20px 80px;
-        max-width: 1400px;
-        margin: 0 auto;
+      /* ─── MAIN ─── */
+      #main {
+        position: relative; z-index: 1;
+        max-width: 1440px; margin: 0 auto;
+        padding: 0 20px 100px;
       }
 
+      /* ─── GRID ─── */
       .grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 8px;
       }
-      @media (min-width: 560px)  { .grid { grid-template-columns: repeat(3, 1fr); } }
-      @media (min-width: 800px)  { .grid { grid-template-columns: repeat(4, 1fr); } }
-      @media (min-width: 1060px) { .grid { grid-template-columns: repeat(5, 1fr); } }
-      @media (min-width: 1300px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+      @media (min-width: 480px)  { .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } }
+      @media (min-width: 720px)  { .grid { grid-template-columns: repeat(4, 1fr); } }
+      @media (min-width: 980px)  { .grid { grid-template-columns: repeat(5, 1fr); } }
+      @media (min-width: 1220px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+      @media (min-width: 1440px) { .grid { grid-template-columns: repeat(7, 1fr); } }
 
-      /* ── CARD ── */
+      /* ─── CARD ─── */
       .card {
         position: relative;
         border-radius: 10px;
         overflow: hidden;
         cursor: pointer;
         aspect-ratio: 2/3;
-        background: var(--surface);
-        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        animation: fadeUp 0.45s ease forwards;
-        opacity: 0;
+        background: var(--surface2);
+        animation: cardIn 0.4s ease both;
+        isolation: isolate;
       }
-      @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(16px); }
+      @keyframes cardIn {
+        from { opacity: 0; transform: translateY(14px); }
         to   { opacity: 1; transform: translateY(0); }
       }
-      .card:hover {
-        transform: scale(1.045) translateY(-5px);
-        box-shadow: 0 20px 50px rgba(229,9,20,0.28), 0 6px 16px rgba(0,0,0,0.5);
-        z-index: 2;
-      }
-      .card img {
-        width: 100%; height: 100%;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.45s ease;
-      }
-      .card:hover img { transform: scale(1.07); }
 
-      .card-overlay {
+      .card::after {
+        content: '';
         position: absolute; inset: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.35) 45%, transparent 70%);
-        opacity: 0;
-        transition: opacity 0.28s ease;
-        display: flex; flex-direction: column; justify-content: flex-end;
-        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0);
+        transition: border-color 0.25s;
+        pointer-events: none;
+        z-index: 3;
       }
-      .card:hover .card-overlay { opacity: 1; }
+      .card:hover::after { border-color: rgba(229,9,20,0.5); }
 
-      .card-title {
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #fff;
-        line-height: 1.3;
+      .card:hover { box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 0 transparent; transform: translateY(-4px) scale(1.035); transition: transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.28s; }
+      .card { transition: transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.28s; }
+
+      .card-img {
+        width: 100%; height: 100%;
+        object-fit: cover; display: block;
+        transition: transform 0.4s ease;
+      }
+      .card:hover .card-img { transform: scale(1.06); }
+
+      .card-grad {
+        position: absolute; inset: 0; z-index: 1;
+        background: linear-gradient(to top,
+          rgba(0,0,0,0.95) 0%,
+          rgba(0,0,0,0.5) 35%,
+          transparent 65%
+        );
+        opacity: 0; transition: opacity 0.25s ease;
+      }
+      .card:hover .card-grad { opacity: 1; }
+
+      .card-info {
+        position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
+        padding: 12px 10px 10px;
+        transform: translateY(6px);
+        opacity: 0; transition: all 0.25s ease;
+      }
+      .card:hover .card-info { opacity: 1; transform: translateY(0); }
+
+      .card-name {
+        font-size: 0.75rem; font-weight: 700; color: #fff;
+        line-height: 1.25; margin-bottom: 6px;
         display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        margin-bottom: 7px;
+        -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
       }
 
-      .card-meta { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+      .card-badges { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
 
-      .badge {
-        font-size: 0.62rem; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 0.8px;
-        padding: 3px 7px; border-radius: 4px;
-        background: var(--red); color: #fff;
+      .cbadge {
+        font-size: 0.58rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.6px;
+        padding: 2px 6px; border-radius: 3px;
       }
-      .badge-rating {
-        font-size: 0.62rem; font-weight: 700;
-        padding: 3px 7px; border-radius: 4px;
-        background: rgba(255,215,0,0.12); color: #ffd700;
-        border: 1px solid rgba(255,215,0,0.2);
-      }
+      .cbadge-type { background: var(--red); color: #fff; }
+      .cbadge-rating { background: rgba(245,197,24,0.15); color: var(--gold); border: 1px solid rgba(245,197,24,0.2); }
 
-      .play-btn {
-        position: absolute; top: 50%; left: 50%;
-        transform: translate(-50%, -50%) scale(0.65);
-        width: 48px; height: 48px;
-        background: rgba(229,9,20,0.95);
+      /* play icon center */
+      .card-play {
+        position: absolute; top: 50%; left: 50%; z-index: 2;
+        transform: translate(-50%, -50%) scale(0.6);
+        width: 44px; height: 44px;
+        background: rgba(229,9,20,0.92);
         border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
         opacity: 0;
-        transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-        box-shadow: 0 0 28px rgba(229,9,20,0.55);
+        transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        box-shadow: 0 0 24px rgba(229,9,20,0.5);
       }
-      .card:hover .play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      .card:hover .card-play { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-      /* ── SKELETON ── */
-      .skeleton {
+      /* source count badge top-right */
+      .card-src-count {
+        position: absolute; top: 8px; right: 8px; z-index: 2;
+        font-size: 0.6rem; font-weight: 700;
+        background: rgba(0,0,0,0.7); color: var(--text-dim);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 2px 7px; border-radius: 99px;
+        backdrop-filter: blur(6px);
+        opacity: 0; transition: opacity 0.2s;
+      }
+      .card:hover .card-src-count { opacity: 1; }
+
+      /* ─── SKELETON ─── */
+      .skel {
         aspect-ratio: 2/3; border-radius: 10px;
-        background: linear-gradient(90deg, #101010 0%, #1c1c1c 50%, #101010 100%);
-        background-size: 400% 100%;
-        animation: shimmer 1.8s ease infinite;
+        background: linear-gradient(100deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%);
+        background-size: 300% 100%;
+        animation: skel 1.6s ease infinite;
       }
-      @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: -100% 50%; } }
-
-      /* ── STATES ── */
-      .empty { text-align: center; padding: 80px 20px; color: var(--text-muted); }
-      .empty-icon { font-size: 3.5rem; margin-bottom: 14px; }
-      .empty h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-      .empty p { font-size: 0.875rem; }
-
-      .error-box {
-        background: rgba(229,9,20,0.07); border: 1px solid rgba(229,9,20,0.25);
-        border-radius: 10px; padding: 18px 20px;
-        color: #f87171; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.875rem;
+      @keyframes skel {
+        0% { background-position: 100% 50%; }
+        100% { background-position: -100% 50%; }
       }
 
-      .load-wrap { display: flex; justify-content: center; padding: 28px 0; }
-      .spinner {
-        width: 22px; height: 22px;
-        border: 2px solid rgba(229,9,20,0.2);
+      /* ─── EMPTY / ERROR ─── */
+      .state-box {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 80px 20px; gap: 12px; color: var(--text-muted);
+        text-align: center;
+      }
+      .state-icon { font-size: 3rem; }
+      .state-title { font-size: 1rem; font-weight: 600; color: var(--text-dim); }
+      .state-sub { font-size: 0.825rem; }
+
+      .err-box {
+        background: rgba(229,9,20,0.06);
+        border: 1px solid rgba(229,9,20,0.2);
+        border-radius: 10px; padding: 16px 18px;
+        color: #fc8181; font-size: 0.85rem; font-weight: 500;
+        display: flex; align-items: center; gap: 10px;
+      }
+
+      /* ─── LOADERS ─── */
+      .load-row { display: flex; justify-content: center; padding: 24px 0; }
+      .spin {
+        width: 20px; height: 20px;
+        border: 2px solid rgba(229,9,20,0.15);
         border-top-color: var(--red);
         border-radius: 50%;
-        animation: spin 0.7s linear infinite;
+        animation: spin 0.65s linear infinite;
       }
       @keyframes spin { to { transform: rotate(360deg); } }
 
-      .end-msg {
-        text-align: center; padding: 28px 0;
-        color: var(--text-muted); font-size: 0.82rem; font-weight: 500;
+      .end-line {
         display: flex; align-items: center; gap: 14px;
+        padding: 28px 0;
+        color: var(--text-muted); font-size: 0.78rem; font-weight: 500;
       }
-      .end-msg::before, .end-msg::after {
+      .end-line::before, .end-line::after {
         content: ''; flex: 1; height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(229,9,20,0.25), transparent);
+        background: linear-gradient(90deg, transparent, rgba(229,9,20,0.2), transparent);
       }
 
-      /* ── MODAL ── */
-      .modal-backdrop {
-        position: fixed; inset: 0;
-        background: rgba(0,0,0,0.82);
-        backdrop-filter: blur(18px);
-        z-index: 200;
+      /* ─── MODAL ─── */
+      .mbg {
+        position: fixed; inset: 0; z-index: 200;
+        background: rgba(0,0,0,0.85);
+        backdrop-filter: blur(20px) saturate(150%);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
         display: flex; align-items: center; justify-content: center;
         padding: 16px;
-        animation: bfadeIn 0.22s ease;
+        animation: mfade 0.2s ease;
       }
-      @keyframes bfadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes mfade { from { opacity: 0; } to { opacity: 1; } }
 
-      .modal {
+      .mbox {
         background: var(--surface);
         border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 18px;
-        width: 100%; max-width: 660px; max-height: 90vh;
+        border-radius: 20px;
+        width: 100%; max-width: 640px; max-height: 90vh;
         overflow-y: auto; position: relative;
-        animation: mslide 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        animation: mslide 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
         scrollbar-width: none;
+        box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(229,9,20,0.05);
       }
-      .modal::-webkit-scrollbar { display: none; }
+      .mbox::-webkit-scrollbar { display: none; }
       @keyframes mslide {
-        from { opacity: 0; transform: translateY(36px) scale(0.95); }
+        from { opacity: 0; transform: translateY(32px) scale(0.96); }
         to   { opacity: 1; transform: translateY(0) scale(1); }
       }
 
-      .modal-hero { position: relative; height: 300px; overflow: hidden; border-radius: 18px 18px 0 0; }
-      .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
-      .modal-hero-grad {
+      .mhero {
+        position: relative; height: 280px;
+        border-radius: 20px 20px 0 0; overflow: hidden;
+      }
+      .mhero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .mhero-grad {
         position: absolute; inset: 0;
-        background: linear-gradient(to top, var(--surface) 0%, rgba(17,17,17,0.2) 60%, transparent 100%);
+        background: linear-gradient(to top, var(--surface) 0%, rgba(17,17,17,0.1) 55%, transparent 100%);
       }
 
-      .modal-close {
-        position: absolute; top: 14px; right: 14px;
-        width: 34px; height: 34px;
-        background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: var(--text-muted); font-size: 0.9rem;
-        transition: all 0.18s; z-index: 10;
+      .mclose {
+        position: absolute; top: 12px; right: 12px; z-index: 10;
+        width: 32px; height: 32px;
+        background: rgba(0,0,0,0.6);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; color: var(--text-dim); font-size: 0.85rem;
+        transition: all 0.15s;
       }
-      .modal-close:hover { color: #fff; background: var(--red); border-color: var(--red); }
+      .mclose:hover { color: #fff; background: var(--red); border-color: var(--red); }
 
-      .modal-body { padding: 4px 22px 26px; }
+      .mbody { padding: 2px 20px 24px; }
 
-      .modal-title {
+      .mtitle {
         font-family: 'Bebas Neue', sans-serif;
-        font-size: 1.9rem; letter-spacing: 2px; color: #fff;
-        margin-bottom: 10px; line-height: 1;
+        font-size: 1.85rem; letter-spacing: 2px; color: #fff;
+        line-height: 1; margin-bottom: 10px;
       }
 
-      .modal-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 22px; }
+      .mtags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
 
-      .tag { padding: 5px 11px; border-radius: 5px; font-size: 0.72rem; font-weight: 600; }
-      .tag-type { background: var(--red); color: #fff; }
-      .tag-rating { background: rgba(255,215,0,0.1); color: #ffd700; border: 1px solid rgba(255,215,0,0.18); }
-      .tag-year { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.07); }
+      .mtag { padding: 4px 10px; border-radius: 5px; font-size: 0.7rem; font-weight: 600; }
+      .mtag-type { background: var(--red); color: #fff; }
+      .mtag-rating { background: rgba(245,197,24,0.1); color: var(--gold); border: 1px solid rgba(245,197,24,0.15); }
+      .mtag-year { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border); }
 
-      .section-label {
-        font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 1.8px; color: var(--text-muted);
-        margin-bottom: 10px;
+      .msec { margin-bottom: 16px; }
+
+      .msec-label {
+        font-size: 0.62rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 2px;
+        color: var(--text-muted);
         display: flex; align-items: center; gap: 8px;
+        margin-bottom: 8px;
       }
-      .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
+      .msec-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-      .modal-section { margin-bottom: 18px; }
-
-      .provider-row {
+      .prow {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 11px 13px; border-radius: 9px;
-        background: var(--surface2); border: 1px solid rgba(255,255,255,0.04);
-        margin-bottom: 7px; transition: all 0.18s; text-decoration: none;
+        padding: 10px 12px; border-radius: 9px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        margin-bottom: 6px;
+        text-decoration: none;
+        transition: all 0.15s ease;
       }
-      .provider-row:hover { border-color: rgba(229,9,20,0.35); background: rgba(229,9,20,0.04); transform: translateX(3px); }
+      .prow:hover { border-color: var(--border-red); background: rgba(229,9,20,0.04); transform: translateX(3px); }
+      .prow:last-child { margin-bottom: 0; }
 
-      .provider-left { display: flex; align-items: center; gap: 11px; }
-      .provider-img {
-        width: 34px; height: 34px; border-radius: 7px; object-fit: cover;
-        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); flex-shrink: 0;
+      .pleft { display: flex; align-items: center; gap: 10px; }
+      .pimg {
+        width: 32px; height: 32px; border-radius: 6px;
+        object-fit: cover; flex-shrink: 0;
+        background: var(--surface3); border: 1px solid var(--border);
       }
-      .provider-name { font-weight: 600; font-size: 0.875rem; color: var(--text); }
+      .pname { font-weight: 600; font-size: 0.85rem; color: var(--text); }
 
-      .watch-link {
-        font-size: 0.78rem; font-weight: 700; color: var(--red-light);
-        display: flex; align-items: center; gap: 4px; white-space: nowrap; transition: gap 0.18s;
+      .pwatch {
+        font-size: 0.75rem; font-weight: 700;
+        color: #f74c42;
+        display: flex; align-items: center; gap: 3px;
+        transition: gap 0.15s;
+        white-space: nowrap;
       }
-      .provider-row:hover .watch-link { gap: 7px; }
+      .prow:hover .pwatch { gap: 7px; }
 
-      .no-sources { text-align: center; padding: 28px; color: var(--text-muted); font-size: 0.875rem; }
+      .no-src { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
+
+      /* ─── RESPONSIVE header padding ─── */
+      @media (max-width: 480px) {
+        .header-inner { padding: 12px 16px; }
+        #main { padding: 0 12px 80px; }
+      }
     </style>
   </head>
 
   <body>
+    <div id="ambient"></div>
     <div id="root"></div>
 
     <script type="text/babel">
-      const { useEffect, useState, useRef, useCallback } = React;
+      const { useEffect, useState, useRef, useCallback, useMemo } = React;
 
-      // ─── CONFIG ───────────────────────────────────────────────────────────────
-      const API_BASE_URL =
+      /* ─── CONFIG ─── */
+      const API_BASE =
         (window.ENV && window.ENV.API_URL)
           ? window.ENV.API_URL
           : 'https://freeflix-production.up.railway.app/';
@@ -388,24 +445,44 @@
       const TMDB = (path, size = 'w500') =>
         path ? `https://image.tmdb.org/t/p/${size}${path}` : '';
 
-      const PER_PAGE = 18;
+      const PER_PAGE = 20;
 
-      // ─── PROVIDER ROW ─────────────────────────────────────────────────────────
+      const SECTION_DEFS = [
+        { key: 'flatrate', label: 'Included with Subscription' },
+        { key: 'rent',     label: 'Rent' },
+        { key: 'buy',      label: 'Buy' },
+        { key: 'free',     label: 'Free' },
+        { key: 'other',    label: 'Other' },
+      ];
+
+      /* ─── DEDUP helper ─── */
+      function dedup(arr) {
+        const seen = new Set();
+        return arr.filter(item => {
+          // Use id if available, otherwise name+type as composite key
+          const key = item.id ?? `${item.name}||${item.type}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      }
+
+      /* ─── PROVIDER ROW ─── */
       function ProviderRow({ src }) {
         return (
-          <a href={src.provider_url || '#'} target="_blank" rel="noopener noreferrer" className="provider-row">
-            <div className="provider-left">
+          <a href={src.provider_url || '#'} target="_blank" rel="noopener noreferrer" className="prow">
+            <div className="pleft">
               <img
                 src={TMDB(src.provider_image, 'w92')}
                 alt={src.provider}
-                className="provider-img"
+                className="pimg"
                 onError={e => { e.target.style.display = 'none'; }}
               />
-              <span className="provider-name">{src.provider}</span>
+              <span className="pname">{src.provider}</span>
             </div>
-            <span className="watch-link">
+            <span className="pwatch">
               Watch
-              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </span>
@@ -413,14 +490,13 @@
         );
       }
 
-      // ─── MODAL ────────────────────────────────────────────────────────────────
+      /* ─── MODAL ─── */
       function Modal({ item, onClose }) {
         if (!item) return null;
 
         useEffect(() => {
           const fn = e => { if (e.key === 'Escape') onClose(); };
           document.addEventListener('keydown', fn);
-          // Prevent body scroll while modal open
           document.body.style.overflow = 'hidden';
           return () => {
             document.removeEventListener('keydown', fn);
@@ -428,44 +504,56 @@
           };
         }, []);
 
-        const grouped = (item.source_info || []).reduce((acc, src) => {
-          const k = src.payment || 'other';
-          (acc[k] = acc[k] || []).push(src);
-          return acc;
-        }, {});
+        const grouped = useMemo(() =>
+          (item.source_info || []).reduce((acc, src) => {
+            const k = src.payment || 'other';
+            (acc[k] = acc[k] || []).push(src);
+            return acc;
+          }, {}),
+        [item]);
 
-        const SECTIONS = [
-          { key: 'flatrate', label: 'Included with subscription' },
-          { key: 'rent',     label: 'Rent' },
-          { key: 'buy',      label: 'Buy' },
-          { key: 'other',    label: 'Other' },
-        ].filter(s => grouped[s.key]?.length > 0);
+        const sections = SECTION_DEFS.filter(s => grouped[s.key]?.length > 0);
+        const srcCount = (item.source_info || []).length;
 
         return (
-          <div className="modal-backdrop" onClick={onClose}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-              <div className="modal-hero">
-                <img src={TMDB(item.image)} alt={item.name} />
-                <div className="modal-hero-grad" />
-                <button className="modal-close" onClick={onClose}>✕</button>
+          <div className="mbg" onClick={onClose}>
+            <div className="mbox" onClick={e => e.stopPropagation()}>
+
+              {/* Hero */}
+              <div className="mhero">
+                <img src={TMDB(item.image, 'w780')} alt={item.name} />
+                <div className="mhero-grad" />
+                <button className="mclose" onClick={onClose} aria-label="Close">✕</button>
               </div>
 
-              <div className="modal-body">
-                <h2 className="modal-title">{item.name.replaceAll('_', ' ')}</h2>
+              {/* Body */}
+              <div className="mbody">
+                <h2 className="mtitle">{item.name.replaceAll('_', ' ')}</h2>
 
-                <div className="modal-tags">
-                  <span className="tag tag-type">{item.type === 'movie' ? '🎬 Movie' : '📺 Series'}</span>
-                  {item.rating && <span className="tag tag-rating">⭐ {item.rating}/10</span>}
-                  {item.year   && <span className="tag tag-year">{item.year}</span>}
+                <div className="mtags">
+                  <span className="mtag mtag-type">
+                    {item.type === 'movie' ? '🎬 Movie' : '📺 Series'}
+                  </span>
+                  {item.rating && (
+                    <span className="mtag mtag-rating">⭐ {item.rating}/10</span>
+                  )}
+                  {item.year && (
+                    <span className="mtag mtag-year">{item.year}</span>
+                  )}
+                  {srcCount > 0 && (
+                    <span className="mtag" style={{background:'rgba(255,255,255,0.05)',color:'#666',border:'1px solid rgba(255,255,255,0.07)'}}>
+                      {srcCount} source{srcCount !== 1 ? 's' : ''}
+                    </span>
+                  )}
                 </div>
 
-                {SECTIONS.length > 0 ? SECTIONS.map(({ key, label }) => (
-                  <div key={key} className="modal-section">
-                    <div className="section-label">{label}</div>
+                {sections.length > 0 ? sections.map(({ key, label }) => (
+                  <div key={key} className="msec">
+                    <div className="msec-label">{label}</div>
                     {grouped[key].map((src, i) => <ProviderRow key={i} src={src} />)}
                   </div>
                 )) : (
-                  <div className="no-sources">No streaming sources found for this title</div>
+                  <div className="no-src">No streaming sources found for this title</div>
                 )}
               </div>
             </div>
@@ -473,25 +561,35 @@
         );
       }
 
-      // ─── CARD ─────────────────────────────────────────────────────────────────
-      function Card({ item, index, onClick, lastRef }) {
+      /* ─── CARD ─── */
+      function Card({ item, index, onClick, cardRef }) {
+        const srcCount = (item.source_info || []).length;
         return (
           <div
             className="card"
-            ref={lastRef}
+            ref={cardRef}
             onClick={onClick}
-            style={{ animationDelay: `${(index % PER_PAGE) * 0.035}s` }}
+            style={{ animationDelay: `${(index % PER_PAGE) * 0.03}s` }}
           >
-            <img src={TMDB(item.image)} alt={item.name} loading="lazy" />
-            <div className="card-overlay">
-              <div className="card-title">{item.name.replaceAll('_', ' ')}</div>
-              <div className="card-meta">
-                <span className="badge">{item.type}</span>
-                {item.rating && <span className="badge-rating">⭐ {item.rating}</span>}
+            <img className="card-img" src={TMDB(item.image)} alt={item.name} loading="lazy" />
+            <div className="card-grad" />
+
+            {srcCount > 0 && (
+              <div className="card-src-count">{srcCount} src</div>
+            )}
+
+            <div className="card-info">
+              <div className="card-name">{item.name.replaceAll('_', ' ')}</div>
+              <div className="card-badges">
+                <span className="cbadge cbadge-type">{item.type}</span>
+                {item.rating && (
+                  <span className="cbadge cbadge-rating">⭐ {item.rating}</span>
+                )}
               </div>
             </div>
-            <div className="play-btn">
-              <svg width="18" height="18" fill="white" viewBox="0 0 24 24">
+
+            <div className="card-play">
+              <svg width="17" height="17" fill="white" viewBox="0 0 24 24">
                 <path d="M8 5v14l11-7z" />
               </svg>
             </div>
@@ -499,84 +597,95 @@
         );
       }
 
-      // ─── SKELETON ─────────────────────────────────────────────────────────────
-      function SkeletonGrid({ count = PER_PAGE }) {
+      /* ─── SKELETON ─── */
+      function Skeletons({ n = PER_PAGE }) {
         return (
           <div className="grid">
-            {Array.from({ length: count }).map((_, i) => <div key={i} className="skeleton" />)}
+            {Array.from({ length: n }).map((_, i) => <div key={i} className="skel" />)}
           </div>
         );
       }
 
-      // ─── APP ──────────────────────────────────────────────────────────────────
+      /* ─── APP ─── */
       function FreeFlix() {
-        const [items, setItems]                 = useState([]);
-        const [selected, setSelected]           = useState(null);
-        const [loading, setLoading]             = useState(true);
-        const [loadingMore, setLoadingMore]     = useState(false);
-        const [error, setError]                 = useState(null);
-        const [page, setPage]                   = useState(1);
-        const [hasMore, setHasMore]             = useState(true);
-        const [totalCount, setTotalCount]       = useState(0);
-        const [sources, setSources]             = useState([]);
+        const [items, setItems]             = useState([]);
+        const [selected, setSelected]       = useState(null);
+        const [loading, setLoading]         = useState(true);
+        const [loadingMore, setLoadingMore] = useState(false);
+        const [error, setError]             = useState(null);
+        const [page, setPage]               = useState(1);
+        const [hasMore, setHasMore]         = useState(true);
+        const [total, setTotal]             = useState(0);
+        const [sources, setSources]         = useState([]);
 
-        const [search, setSearch]               = useState('');
-        const [debouncedSearch, setDebounced]   = useState('');
-        const [typeFilter, setTypeFilter]       = useState('all');
-        const [sourceFilter, setSourceFilter]   = useState('all');
+        const [search, setSearch]           = useState('');
+        const [debSearch, setDebSearch]     = useState('');
+        const [typeFilter, setTypeFilter]   = useState('all');
+        const [srcFilter, setSrcFilter]     = useState('all');
+
+        /* Header height ref for dynamic padding */
+        const headerRef = useRef();
+        const [headerH, setHeaderH] = useState(180);
+        useEffect(() => {
+          if (!headerRef.current) return;
+          const ro = new ResizeObserver(() => {
+            setHeaderH(headerRef.current.offsetHeight);
+          });
+          ro.observe(headerRef.current);
+          return () => ro.disconnect();
+        }, []);
 
         const observerRef = useRef();
         const lastCardRef = useRef();
 
-        // Debounce
+        /* Debounce search */
         useEffect(() => {
-          const t = setTimeout(() => setDebounced(search), 450);
+          const t = setTimeout(() => setDebSearch(search), 420);
           return () => clearTimeout(t);
         }, [search]);
 
-        // Fetch
-        const fetchItems = useCallback((pageNum, append = false, q = '') => {
+        /* Fetch */
+        const fetchItems = useCallback((pageNum, append, q) => {
           append ? setLoadingMore(true) : setLoading(true);
           setError(null);
 
-          const params = new URLSearchParams({ page: pageNum, limit: PER_PAGE });
-          if (q) params.set('search', q);
+          const p = new URLSearchParams({ page: pageNum, limit: PER_PAGE });
+          if (q) p.set('search', q);
 
-          fetch(`${API_BASE_URL}?${params}`)
-            .then(res => {
-              if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-              return res.json();
+          fetch(`${API_BASE}?${p}`)
+            .then(r => {
+              if (!r.ok) throw new Error(`${r.status}`);
+              return r.json();
             })
             .then(data => {
-              // ── BUG FIX: safely handle different response shapes
-              const incoming = Array.isArray(data)
+              const raw = Array.isArray(data)
                 ? data
-                : Array.isArray(data.content)
-                  ? data.content
-                  : [];
+                : Array.isArray(data.content) ? data.content : [];
 
-              const count = data.count ?? data.total ?? incoming.length;
+              /* ── DEDUP: remove items already in state + internal duplicates ── */
+              const fresh = dedup(raw);
 
-              if (append) {
-                setItems(prev => [...prev, ...incoming]);
-              } else {
-                setItems(incoming);
-                setTotalCount(count);
+              const cnt = data.count ?? data.total ?? null;
 
-                // Build provider list from first page results
+              setItems(prev => {
+                const next = append ? dedup([...prev, ...fresh]) : fresh;
+                return next;
+              });
+
+              if (!append) {
+                if (cnt !== null) setTotal(cnt);
+
+                /* Build source list */
                 const seen = new Set();
-                incoming.forEach(item =>
-                  (item.source_info || []).forEach(s => seen.add(s.provider))
-                );
-                setSources([...seen].sort());
+                fresh.forEach(it => (it.source_info || []).forEach(s => seen.add(s.provider)));
+                setSources([...seen].filter(Boolean).sort());
               }
 
-              // If fewer items than requested, we've hit the end
-              setHasMore(incoming.length === PER_PAGE);
+              setHasMore(fresh.length === PER_PAGE);
             })
             .catch(err => {
-              console.error('Fetch error:', err);
-              setError('Could not reach the server. Please try again.');
+              console.error(err);
+              setError('Could not reach the server — please try again.');
             })
             .finally(() => {
               setLoading(false);
@@ -584,108 +693,93 @@
             });
         }, []);
 
-        // Reset + fetch on filter/search change
+        /* Reset on filter / search change */
         useEffect(() => {
           setPage(1);
           setItems([]);
           setHasMore(true);
-          fetchItems(1, false, debouncedSearch);
-        }, [debouncedSearch, typeFilter, sourceFilter, fetchItems]);
+          fetchItems(1, false, debSearch);
+        }, [debSearch, typeFilter, srcFilter, fetchItems]);
 
-        // Load next page
+        /* Load next page */
         const loadMore = useCallback(() => {
           if (loadingMore || !hasMore || loading) return;
           const next = page + 1;
           setPage(next);
-          fetchItems(next, true, debouncedSearch);
-        }, [page, hasMore, loadingMore, loading, fetchItems, debouncedSearch]);
+          fetchItems(next, true, debSearch);
+        }, [page, hasMore, loadingMore, loading, fetchItems, debSearch]);
 
-        // Infinite scroll observer
+        /* Infinite scroll */
         useEffect(() => {
           observerRef.current = new IntersectionObserver(
             entries => { if (entries[0].isIntersecting) loadMore(); },
-            { rootMargin: '350px' }
+            { rootMargin: '400px' }
           );
           if (lastCardRef.current) observerRef.current.observe(lastCardRef.current);
           return () => observerRef.current?.disconnect();
         }, [loadMore]);
 
-        // ── CLIENT-SIDE FILTER ────────────────────────────────────────────────
-        // BUG FIX: previously items would flicker to "no content" when filter
-        // changed before new data arrived. Now we only show empty state when
-        // loading is fully done AND filtered result is truly empty.
-        const filtered = items.filter(item => {
+        /* Client-side filter */
+        const filtered = useMemo(() => items.filter(item => {
           if (typeFilter !== 'all' && item.type !== typeFilter) return false;
-          if (sourceFilter !== 'all') {
-            const providers = (item.source_info || []).map(s => s.provider);
-            if (!providers.includes(sourceFilter)) return false;
+          if (srcFilter !== 'all') {
+            const ps = (item.source_info || []).map(s => s.provider);
+            if (!ps.includes(srcFilter)) return false;
           }
           return true;
-        });
+        }), [items, typeFilter, srcFilter]);
 
         const showEmpty = !loading && !loadingMore && !error && filtered.length === 0;
 
-        // Dynamic header height for main padding
-        const headerHeight = 'calc(178px + 16px)';
-
         return (
-          <div style={{ minHeight: '100vh' }}>
-
+          <>
             {/* ── HEADER ── */}
-            <header className="header">
+            <header id="header" ref={headerRef}>
               <div className="header-inner">
                 <div className="header-top">
-                  <div className="logo"><span className="r">FREE</span><span className="w">FLIX</span></div>
-                  {totalCount > 0 && (
-                    <div className="stats-pill">{totalCount.toLocaleString()} titles</div>
-                  )}
+                  <div className="logo">
+                    <span className="logo-red">FREE</span>
+                    <span className="logo-white">FLIX</span>
+                  </div>
+                  <div className="header-right">
+                    {total > 0 && (
+                      <div className="pill">{total.toLocaleString()} titles</div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="search-wrap">
                   <input
-                    type="text"
                     className="search-input"
-                    placeholder="Search movies & series..."
+                    type="text"
+                    placeholder="Search movies & series…"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
+                    autoComplete="off"
+                    spellCheck="false"
                   />
                   <svg className="search-icon" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
 
-                <div className="filters">
+                <div className="filter-bar">
                   {[
-                    { val: 'all',    label: 'All' },
-                    { val: 'movie',  label: '🎬 Movies' },
-                    { val: 'series', label: '📺 Series' },
-                  ].map(({ val, label }) => (
-                    <button
-                      key={val}
-                      className={`filter-btn ${typeFilter === val ? 'active' : ''}`}
-                      onClick={() => setTypeFilter(val)}
-                    >
-                      {label}
-                    </button>
+                    { v: 'all',    l: 'All' },
+                    { v: 'movie',  l: '🎬 Movies' },
+                    { v: 'series', l: '📺 Series' },
+                  ].map(({ v, l }) => (
+                    <button key={v} className={`fbtn ${typeFilter === v ? 'on' : ''}`} onClick={() => setTypeFilter(v)}>{l}</button>
                   ))}
 
                   {sources.length > 0 && (
                     <>
-                      <div className="filter-sep" />
-                      <button
-                        className={`filter-btn ${sourceFilter === 'all' ? 'active' : ''}`}
-                        onClick={() => setSourceFilter('all')}
-                      >
+                      <div className="fsep" />
+                      <button className={`fbtn ${srcFilter === 'all' ? 'on' : ''}`} onClick={() => setSrcFilter('all')}>
                         All Sources
                       </button>
-                      {sources.map(src => (
-                        <button
-                          key={src}
-                          className={`filter-btn ${sourceFilter === src ? 'active' : ''}`}
-                          onClick={() => setSourceFilter(src)}
-                        >
-                          {src}
-                        </button>
+                      {sources.map(s => (
+                        <button key={s} className={`fbtn ${srcFilter === s ? 'on' : ''}`} onClick={() => setSrcFilter(s)}>{s}</button>
                       ))}
                     </>
                   )}
@@ -694,14 +788,14 @@
             </header>
 
             {/* ── MAIN ── */}
-            <main className="main" style={{ paddingTop: headerHeight }}>
+            <main id="main" style={{ paddingTop: headerH + 16 }}>
 
-              {loading && <SkeletonGrid count={PER_PAGE} />}
+              {loading && <Skeletons n={PER_PAGE} />}
 
               {error && (
-                <div className="error-box">
-                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+                <div className="err-box">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
                   </svg>
                   {error}
                 </div>
@@ -709,38 +803,40 @@
 
               {!loading && !error && filtered.length > 0 && (
                 <div className="grid">
-                  {filtered.map((item, i) => (
-                    <Card
-                      key={`${item.name}-${i}`}
-                      item={item}
-                      index={i}
-                      onClick={() => setSelected(item)}
-                      lastRef={i === filtered.length - 1 ? lastCardRef : null}
-                    />
-                  ))}
+                  {filtered.map((item, i) => {
+                    const key = item.id ?? `${item.name}||${item.type}`;
+                    return (
+                      <Card
+                        key={key}
+                        item={item}
+                        index={i}
+                        onClick={() => setSelected(item)}
+                        cardRef={i === filtered.length - 1 ? lastCardRef : null}
+                      />
+                    );
+                  })}
                 </div>
               )}
 
               {showEmpty && (
-                <div className="empty">
-                  <div className="empty-icon">🔍</div>
-                  <h3>No results found</h3>
-                  <p>Try a different search term or clear your filters</p>
+                <div className="state-box">
+                  <div className="state-icon">🔍</div>
+                  <div className="state-title">No results found</div>
+                  <div className="state-sub">Try a different search or clear your filters</div>
                 </div>
               )}
 
               {loadingMore && (
-                <div className="load-wrap"><div className="spinner" /></div>
+                <div className="load-row"><div className="spin" /></div>
               )}
 
               {!loading && !loadingMore && !hasMore && filtered.length > 0 && (
-                <div className="end-msg">You've seen it all 🎬</div>
+                <div className="end-line">You've seen it all 🎬</div>
               )}
-
             </main>
 
             {selected && <Modal item={selected} onClose={() => setSelected(null)} />}
-          </div>
+          </>
         );
       }
 
