@@ -2,407 +2,374 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Aysem seni seviyorum - Stream Your Sources</title>
+    <title>FreeFlix - Stream Your Sources</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- React -->
-    <script
-      crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-    ></script>
-
-    <!-- Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&family=Roboto:wght@300;400;500;700&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap");
 
-      * {
-        font-family: "Roboto", sans-serif;
+      :root {
+        --red: #e50914;
+        --red-dark: #b20710;
+        --red-light: #f74c42;
+        --bg: #080808;
+        --surface: #111111;
+        --surface2: #1a1a1a;
+        --border: rgba(229, 9, 20, 0.18);
+        --text: #f0f0f0;
+        --text-muted: #555;
       }
 
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-family: "Montserrat", sans-serif;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-      }
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
       body {
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        font-family: 'DM Sans', sans-serif;
+        background: var(--bg);
+        color: var(--text);
         overflow-x: hidden;
-        position: relative;
       }
 
       body::before {
-        content: "";
+        content: '';
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background:
-          radial-gradient(
-            circle at 20% 50%,
-            rgba(229, 9, 20, 0.08) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 80% 80%,
-            rgba(247, 76, 66, 0.05) 0%,
-            transparent 50%
-          );
+          radial-gradient(ellipse 80% 50% at 10% 20%, rgba(229,9,20,0.06) 0%, transparent 60%),
+          radial-gradient(ellipse 60% 40% at 90% 80%, rgba(229,9,20,0.04) 0%, transparent 60%);
         pointer-events: none;
         z-index: 0;
       }
 
-      :root {
-        --netflix-red: #e50914;
-        --netflix-darkred: #b20710;
-        --netflix-lightred: #f74c42;
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: var(--bg); }
+      ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 3px; }
+
+      /* ── HEADER ── */
+      .header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        z-index: 100;
+        background: linear-gradient(180deg, rgba(8,8,8,0.98) 0%, rgba(8,8,8,0.9) 100%);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+        padding: 14px 24px;
       }
 
-      ::-webkit-scrollbar {
-        width: 12px;
+      .header-inner { max-width: 1400px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+      .header-top { display: flex; align-items: center; justify-content: space-between; }
+
+      .logo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2rem;
+        letter-spacing: 4px;
+        line-height: 1;
+        text-decoration: none;
+      }
+      .logo .r { color: var(--red); }
+      .logo .w { color: var(--text); }
+
+      .stats-pill {
+        font-size: 0.68rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border: 1px solid rgba(255,255,255,0.07);
+        padding: 5px 12px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.03);
       }
 
-      ::-webkit-scrollbar-track {
-        background: rgba(10, 10, 10, 0.5);
+      .search-wrap { position: relative; }
+      .search-input {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 10px;
+        padding: 11px 42px 11px 15px;
+        color: var(--text);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.875rem;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        outline: none;
+      }
+      .search-input::placeholder { color: var(--text-muted); }
+      .search-input:focus {
+        border-color: var(--red);
+        box-shadow: 0 0 0 3px rgba(229,9,20,0.1);
+        background: var(--surface2);
+      }
+      .search-icon {
+        position: absolute;
+        right: 13px; top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
       }
 
-      ::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #e50914, #f74c42);
-        border-radius: 6px;
-        border: 2px solid transparent;
-        background-clip: padding-box;
+      .filters {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .filters::-webkit-scrollbar { display: none; }
+
+      .filter-sep { width: 1px; background: rgba(255,255,255,0.07); flex-shrink: 0; margin: 0 2px; }
+
+      .filter-btn {
+        flex-shrink: 0;
+        padding: 6px 14px;
+        border-radius: 7px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: var(--surface);
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.18s ease;
+        white-space: nowrap;
+      }
+      .filter-btn:hover { border-color: rgba(229,9,20,0.4); color: var(--text); background: var(--surface2); }
+      .filter-btn.active { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 3px 12px rgba(229,9,20,0.3); }
+
+      /* ── GRID ── */
+      .main {
+        position: relative;
+        z-index: 1;
+        padding: 0 20px 80px;
+        max-width: 1400px;
+        margin: 0 auto;
       }
 
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      @media (min-width: 560px)  { .grid { grid-template-columns: repeat(3, 1fr); } }
+      @media (min-width: 800px)  { .grid { grid-template-columns: repeat(4, 1fr); } }
+      @media (min-width: 1060px) { .grid { grid-template-columns: repeat(5, 1fr); } }
+      @media (min-width: 1300px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+
+      /* ── CARD ── */
       .card {
         position: relative;
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        border-radius: 10px;
         overflow: hidden;
-        border-radius: 14px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      }
-
-      .card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-          135deg,
-          rgba(229, 9, 20, 0.8),
-          rgba(247, 76, 66, 0.4),
-          rgba(178, 7, 16, 0.2)
-        );
+        cursor: pointer;
+        aspect-ratio: 2/3;
+        background: var(--surface);
+        transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        animation: fadeUp 0.45s ease forwards;
         opacity: 0;
-        z-index: 1;
-        transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
-
-      .card:hover::before {
-        opacity: 1;
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to   { opacity: 1; transform: translateY(0); }
       }
-
       .card:hover {
-        transform: scale(1.05) translateY(-8px);
-        box-shadow: 0 40px 80px rgba(229, 9, 20, 0.35);
+        transform: scale(1.045) translateY(-5px);
+        box-shadow: 0 20px 50px rgba(229,9,20,0.28), 0 6px 16px rgba(0,0,0,0.5);
+        z-index: 2;
       }
+      .card img {
+        width: 100%; height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.45s ease;
+      }
+      .card:hover img { transform: scale(1.07); }
 
-      .card-shine {
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(
-          45deg,
-          transparent 0%,
-          rgba(255, 255, 255, 0.2) 45%,
-          rgba(255, 255, 255, 0.3) 50%,
-          rgba(255, 255, 255, 0.2) 55%,
-          transparent 100%
-        );
-        transform: rotate(45deg);
+      .card-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.35) 45%, transparent 70%);
         opacity: 0;
-        transition: opacity 0.5s;
+        transition: opacity 0.28s ease;
+        display: flex; flex-direction: column; justify-content: flex-end;
+        padding: 14px;
       }
+      .card:hover .card-overlay { opacity: 1; }
 
-      .card:hover .card-shine {
-        opacity: 1;
-        animation: shine 0.7s ease-out;
-      }
-
-      @keyframes shine {
-        0% {
-          transform: translateX(-150%) translateY(-150%) rotate(45deg);
-        }
-        100% {
-          transform: translateX(150%) translateY(150%) rotate(45deg);
-        }
-      }
-
-      .premium-badge {
-        background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
-        box-shadow: 0 10px 32px rgba(229, 9, 20, 0.45);
-        transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-      }
-
-      .premium-badge:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 16px 40px rgba(229, 9, 20, 0.55);
-      }
-
-      .fade-in {
-        animation: fadeInUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-        opacity: 0;
-      }
-
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes shimmerPremium {
-        0% {
-          background-position: -1000px 0;
-        }
-        100% {
-          background-position: 1000px 0;
-        }
-      }
-
-      .skeleton {
-        background: linear-gradient(
-          90deg,
-          #161616 0%,
-          #2a2a2a 50%,
-          #161616 100%
-        );
-        background-size: 1000px 100%;
-        animation: shimmerPremium 2.5s infinite;
-        border-radius: 14px;
-      }
-
-      @keyframes slideInPremium {
-        from {
-          opacity: 0;
-          transform: scale(0.88) translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1) translateY(0);
-        }
-      }
-
-      .modal-content {
-        animation: slideInPremium 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        background: linear-gradient(
-          135deg,
-          #1a1a1a 0%,
-          #0f0f0f 50%,
-          #0a0a0a 100%
-        );
-        border: 1px solid rgba(229, 9, 20, 0.3);
-        box-shadow: 0 50px 100px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(20px);
-      }
-
-      @keyframes fadeInPremium {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-
-      .modal-backdrop {
-        animation: fadeInPremium 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      }
-
-      .header-glow {
-        background: linear-gradient(
-          to bottom,
-          rgba(10, 10, 10, 0.95),
-          rgba(10, 10, 10, 0.85)
-        );
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(229, 9, 20, 0.15);
-      }
-
-      .source-button {
-        background: linear-gradient(
-          135deg,
-          rgba(26, 26, 26, 0.8),
-          rgba(15, 15, 15, 0.9)
-        );
-        border: 1px solid rgba(229, 9, 20, 0.4);
-        transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        backdrop-filter: blur(10px);
-      }
-
-      .source-button:hover {
-        background: linear-gradient(
-          135deg,
-          rgba(42, 42, 42, 0.9),
-          rgba(26, 26, 26, 0.95)
-        );
-        border-color: #e50914;
-        box-shadow: 0 12px 36px rgba(229, 9, 20, 0.3);
-        transform: translateX(6px);
-      }
-
-      .play-overlay {
-        background: radial-gradient(
-          circle at center,
-          rgba(229, 9, 20, 0.98),
-          rgba(178, 7, 16, 0.85)
-        );
-        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        box-shadow: 0 0 40px rgba(229, 9, 20, 0.6);
-      }
-
-      .card:hover .play-overlay {
-        transform: scale(1.15);
-        box-shadow: 0 0 60px rgba(229, 9, 20, 0.8);
-      }
-
-      .badge-style {
-        background: linear-gradient(135deg, #e50914, #b20710);
-        box-shadow: 0 6px 16px rgba(229, 9, 20, 0.4);
-        display: inline-block;
-        padding: 5px 14px;
-        border-radius: 20px;
-        font-size: 0.75rem;
+      .card-title {
+        font-size: 0.8rem;
         font-weight: 700;
-        white-space: nowrap;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .rating-style {
-        background: linear-gradient(
-          135deg,
-          rgba(229, 9, 20, 0.25),
-          rgba(229, 9, 20, 0.12)
-        );
-        border: 1px solid rgba(229, 9, 20, 0.5);
-        padding: 5px 14px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        white-space: nowrap;
-        color: #f74c42;
-        letter-spacing: 0.3px;
-      }
-
-      .premium-divider {
-        background: linear-gradient(
-          90deg,
-          transparent 0%,
-          rgba(229, 9, 20, 0.4) 50%,
-          transparent 100%
-        );
-      }
-
-      .error-container {
-        background: linear-gradient(
-          135deg,
-          rgba(229, 9, 20, 0.15),
-          rgba(247, 76, 66, 0.08)
-        );
-        border: 1px solid rgba(229, 9, 20, 0.5);
-        border-radius: 16px;
-      }
-
-      .search-input {
-        background: linear-gradient(
-          135deg,
-          rgba(26, 26, 26, 0.9),
-          rgba(15, 15, 15, 0.95)
-        );
-        border: 1px solid rgba(229, 9, 20, 0.3);
-        transition: all 0.3s ease;
-      }
-
-      .search-input:focus {
-        outline: none;
-        border-color: #e50914;
-        box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
-      }
-
-      .filter-button {
-        background: linear-gradient(
-          135deg,
-          rgba(26, 26, 26, 0.8),
-          rgba(15, 15, 15, 0.9)
-        );
-        border: 1px solid rgba(229, 9, 20, 0.3);
-        transition: all 0.3s ease;
-      }
-
-      .filter-button:hover {
-        border-color: #e50914;
-        transform: translateY(-2px);
-      }
-
-      .filter-button.active {
-        background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
-        border-color: #e50914;
-        box-shadow: 0 8px 24px rgba(229, 9, 20, 0.4);
-      }
-
-      .text-fixed-2 {
+        color: #fff;
+        line-height: 1.3;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        margin-bottom: 7px;
       }
 
-      .provider-logo {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        object-fit: cover;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+      .card-meta { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+
+      .badge {
+        font-size: 0.62rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.8px;
+        padding: 3px 7px; border-radius: 4px;
+        background: var(--red); color: #fff;
+      }
+      .badge-rating {
+        font-size: 0.62rem; font-weight: 700;
+        padding: 3px 7px; border-radius: 4px;
+        background: rgba(255,215,0,0.12); color: #ffd700;
+        border: 1px solid rgba(255,215,0,0.2);
       }
 
-      .section-header {
-        background: linear-gradient(
-          135deg,
-          rgba(229, 9, 20, 0.2),
-          rgba(229, 9, 20, 0.1)
-        );
-        border-left: 4px solid #e50914;
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-bottom: 16px;
+      .play-btn {
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%) scale(0.65);
+        width: 48px; height: 48px;
+        background: rgba(229,9,20,0.95);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0;
+        transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 0 28px rgba(229,9,20,0.55);
       }
+      .card:hover .play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+      /* ── SKELETON ── */
+      .skeleton {
+        aspect-ratio: 2/3; border-radius: 10px;
+        background: linear-gradient(90deg, #101010 0%, #1c1c1c 50%, #101010 100%);
+        background-size: 400% 100%;
+        animation: shimmer 1.8s ease infinite;
+      }
+      @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: -100% 50%; } }
+
+      /* ── STATES ── */
+      .empty { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+      .empty-icon { font-size: 3.5rem; margin-bottom: 14px; }
+      .empty h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+      .empty p { font-size: 0.875rem; }
+
+      .error-box {
+        background: rgba(229,9,20,0.07); border: 1px solid rgba(229,9,20,0.25);
+        border-radius: 10px; padding: 18px 20px;
+        color: #f87171; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 0.875rem;
+      }
+
+      .load-wrap { display: flex; justify-content: center; padding: 28px 0; }
+      .spinner {
+        width: 22px; height: 22px;
+        border: 2px solid rgba(229,9,20,0.2);
+        border-top-color: var(--red);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .end-msg {
+        text-align: center; padding: 28px 0;
+        color: var(--text-muted); font-size: 0.82rem; font-weight: 500;
+        display: flex; align-items: center; gap: 14px;
+      }
+      .end-msg::before, .end-msg::after {
+        content: ''; flex: 1; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(229,9,20,0.25), transparent);
+      }
+
+      /* ── MODAL ── */
+      .modal-backdrop {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.82);
+        backdrop-filter: blur(18px);
+        z-index: 200;
+        display: flex; align-items: center; justify-content: center;
+        padding: 16px;
+        animation: bfadeIn 0.22s ease;
+      }
+      @keyframes bfadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+      .modal {
+        background: var(--surface);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 18px;
+        width: 100%; max-width: 660px; max-height: 90vh;
+        overflow-y: auto; position: relative;
+        animation: mslide 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        scrollbar-width: none;
+      }
+      .modal::-webkit-scrollbar { display: none; }
+      @keyframes mslide {
+        from { opacity: 0; transform: translateY(36px) scale(0.95); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      .modal-hero { position: relative; height: 300px; overflow: hidden; border-radius: 18px 18px 0 0; }
+      .modal-hero img { width: 100%; height: 100%; object-fit: cover; }
+      .modal-hero-grad {
+        position: absolute; inset: 0;
+        background: linear-gradient(to top, var(--surface) 0%, rgba(17,17,17,0.2) 60%, transparent 100%);
+      }
+
+      .modal-close {
+        position: absolute; top: 14px; right: 14px;
+        width: 34px; height: 34px;
+        background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; color: var(--text-muted); font-size: 0.9rem;
+        transition: all 0.18s; z-index: 10;
+      }
+      .modal-close:hover { color: #fff; background: var(--red); border-color: var(--red); }
+
+      .modal-body { padding: 4px 22px 26px; }
+
+      .modal-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.9rem; letter-spacing: 2px; color: #fff;
+        margin-bottom: 10px; line-height: 1;
+      }
+
+      .modal-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 22px; }
+
+      .tag { padding: 5px 11px; border-radius: 5px; font-size: 0.72rem; font-weight: 600; }
+      .tag-type { background: var(--red); color: #fff; }
+      .tag-rating { background: rgba(255,215,0,0.1); color: #ffd700; border: 1px solid rgba(255,215,0,0.18); }
+      .tag-year { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.07); }
+
+      .section-label {
+        font-size: 0.67rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 1.8px; color: var(--text-muted);
+        margin-bottom: 10px;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.05); }
+
+      .modal-section { margin-bottom: 18px; }
+
+      .provider-row {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 11px 13px; border-radius: 9px;
+        background: var(--surface2); border: 1px solid rgba(255,255,255,0.04);
+        margin-bottom: 7px; transition: all 0.18s; text-decoration: none;
+      }
+      .provider-row:hover { border-color: rgba(229,9,20,0.35); background: rgba(229,9,20,0.04); transform: translateX(3px); }
+
+      .provider-left { display: flex; align-items: center; gap: 11px; }
+      .provider-img {
+        width: 34px; height: 34px; border-radius: 7px; object-fit: cover;
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); flex-shrink: 0;
+      }
+      .provider-name { font-weight: 600; font-size: 0.875rem; color: var(--text); }
+
+      .watch-link {
+        font-size: 0.78rem; font-weight: 700; color: var(--red-light);
+        display: flex; align-items: center; gap: 4px; white-space: nowrap; transition: gap 0.18s;
+      }
+      .provider-row:hover .watch-link { gap: 7px; }
+
+      .no-sources { text-align: center; padding: 28px; color: var(--text-muted); font-size: 0.875rem; }
     </style>
   </head>
 
@@ -412,208 +379,93 @@
     <script type="text/babel">
       const { useEffect, useState, useRef, useCallback } = React;
 
+      // ─── CONFIG ───────────────────────────────────────────────────────────────
+      const API_BASE_URL =
+        (window.ENV && window.ENV.API_URL)
+          ? window.ENV.API_URL
+          : 'https://freeflix-production.up.railway.app/';
+
+      const TMDB = (path, size = 'w500') =>
+        path ? `https://image.tmdb.org/t/p/${size}${path}` : '';
+
+      const PER_PAGE = 18;
+
+      // ─── PROVIDER ROW ─────────────────────────────────────────────────────────
+      function ProviderRow({ src }) {
+        return (
+          <a href={src.provider_url || '#'} target="_blank" rel="noopener noreferrer" className="provider-row">
+            <div className="provider-left">
+              <img
+                src={TMDB(src.provider_image, 'w92')}
+                alt={src.provider}
+                className="provider-img"
+                onError={e => { e.target.style.display = 'none'; }}
+              />
+              <span className="provider-name">{src.provider}</span>
+            </div>
+            <span className="watch-link">
+              Watch
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
+          </a>
+        );
+      }
+
+      // ─── MODAL ────────────────────────────────────────────────────────────────
       function Modal({ item, onClose }) {
         if (!item) return null;
 
-        // Group sources by payment type
-        const groupedSources =
-          item.source_info?.reduce((acc, src) => {
-            const payment = src.payment || "other";
-            if (!acc[payment]) acc[payment] = [];
-            acc[payment].push(src);
-            return acc;
-          }, {}) || {};
+        useEffect(() => {
+          const fn = e => { if (e.key === 'Escape') onClose(); };
+          document.addEventListener('keydown', fn);
+          // Prevent body scroll while modal open
+          document.body.style.overflow = 'hidden';
+          return () => {
+            document.removeEventListener('keydown', fn);
+            document.body.style.overflow = '';
+          };
+        }, []);
 
-        const hasRent = groupedSources.rent?.length > 0;
-        const hasBuy = groupedSources.buy?.length > 0;
+        const grouped = (item.source_info || []).reduce((acc, src) => {
+          const k = src.payment || 'other';
+          (acc[k] = acc[k] || []).push(src);
+          return acc;
+        }, {});
+
+        const SECTIONS = [
+          { key: 'flatrate', label: 'Included with subscription' },
+          { key: 'rent',     label: 'Rent' },
+          { key: 'buy',      label: 'Buy' },
+          { key: 'other',    label: 'Other' },
+        ].filter(s => grouped[s.key]?.length > 0);
 
         return (
-          <div
-            className="modal-backdrop fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-md"
-            onClick={onClose}
-          >
-            <div
-              className="modal-content text-white rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 md:p-8 relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={onClose}
-                className="absolute top-6 right-6 z-10 text-gray-400 hover:text-red-500 transition text-3xl hover:scale-110 duration-300"
-              >
-                ✕
-              </button>
-
-              <div className="relative mb-8 group">
-                <img
-                  src={"https://image.tmdb.org/t/p/w500" + item.image}
-                  alt={item.name}
-                  className="w-full h-80 md:h-96 object-cover rounded-2xl shadow-2xl"
-                />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-300"></div>
+          <div className="modal-backdrop" onClick={onClose}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <div className="modal-hero">
+                <img src={TMDB(item.image)} alt={item.name} />
+                <div className="modal-hero-grad" />
+                <button className="modal-close" onClick={onClose}>✕</button>
               </div>
 
-              <div className="mb-8">
-                <h2 className="text-3xl md:text-4xl font-black capitalize mb-4 text-white">
-                  {item.name.replaceAll("_", " ")}
-                </h2>
-                <div className="flex gap-3 items-center flex-wrap">
-                  <span className="premium-badge px-4 py-2 rounded-full text-white text-sm font-bold">
-                    {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-                  </span>
-                  {item.rating && (
-                    <span className="px-4 py-2 bg-gradient-to-r from-red-900/40 to-red-800/20 border border-red-600/40 rounded-full text-red-300 font-semibold flex items-center gap-2">
-                      ⭐ {item.rating}/10
-                    </span>
-                  )}
-                  {item.year && (
-                    <span className="px-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-full text-gray-300 font-semibold">
-                      {item.year}
-                    </span>
-                  )}
+              <div className="modal-body">
+                <h2 className="modal-title">{item.name.replaceAll('_', ' ')}</h2>
+
+                <div className="modal-tags">
+                  <span className="tag tag-type">{item.type === 'movie' ? '🎬 Movie' : '📺 Series'}</span>
+                  {item.rating && <span className="tag tag-rating">⭐ {item.rating}/10</span>}
+                  {item.year   && <span className="tag tag-year">{item.year}</span>}
                 </div>
-              </div>
 
-              <div className="h-px premium-divider mb-8"></div>
-
-              <div>
-                <h3 className="font-black text-xl mb-6 tracking-tight text-white">
-                  Watch On
-                </h3>
-
-                {hasRent || hasBuy ? (
-                  <div className="space-y-6">
-                    {/* Rent Section */}
-                    {hasRent && (
-                      <div>
-                        <div className="section-header">
-                          <h4 className="font-bold text-lg text-white flex items-center gap-2">
-                            <svg
-                              className="w-5 h-5"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z" />
-                            </svg>
-                            Rent
-                          </h4>
-                        </div>
-                        <ul className="space-y-3">
-                          {groupedSources.rent.map((src, i) => (
-                            <li
-                              key={i}
-                              className="source-button flex justify-between items-center px-5 md:px-6 py-4 md:py-5 rounded-xl group"
-                            >
-                              <div className="flex items-center gap-4">
-                                <img
-                                  src={
-                                    "https://image.tmdb.org/t/p/w92" +
-                                    src.provider_image
-                                  }
-                                  alt={src.provider}
-                                  className="provider-logo"
-                                  onError={(e) => {
-                                    e.target.style.display = "none";
-                                  }}
-                                />
-                                <span className="font-semibold text-base md:text-lg text-gray-200">
-                                  {src.provider}
-                                </span>
-                              </div>
-                              <a
-                                href={src.provider_url || "#"}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-red-500 font-bold text-base hover:text-red-400 transition flex items-center gap-2 group-hover:gap-3"
-                              >
-                                Watch
-                                <svg
-                                  className="w-5 h-5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                                  />
-                                </svg>
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Buy Section */}
-                    {hasBuy && (
-                      <div>
-                        <div className="section-header">
-                          <h4 className="font-bold text-lg text-white flex items-center gap-2">
-                            <svg
-                              className="w-5 h-5"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
-                            </svg>
-                            Buy
-                          </h4>
-                        </div>
-                        <ul className="space-y-3">
-                          {groupedSources.buy.map((src, i) => (
-                            <li
-                              key={i}
-                              className="source-button flex justify-between items-center px-5 md:px-6 py-4 md:py-5 rounded-xl group"
-                            >
-                              <div className="flex items-center gap-4">
-                                <img
-                                  src={
-                                    "https://image.tmdb.org/t/p/w92" +
-                                    src.provider_image
-                                  }
-                                  alt={src.provider}
-                                  className="provider-logo"
-                                  onError={(e) => {
-                                    e.target.style.display = "none";
-                                  }}
-                                />
-                                <span className="font-semibold text-base md:text-lg text-gray-200">
-                                  {src.provider}
-                                </span>
-                              </div>
-                              <a
-                                href={src.provider_url || "#"}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-red-500 font-bold text-base hover:text-red-400 transition flex items-center gap-2 group-hover:gap-3"
-                              >
-                                Watch
-                                <svg
-                                  className="w-5 h-5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M14 5l7 7m0 0l-7 7m7-7H3"
-                                  />
-                                </svg>
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                {SECTIONS.length > 0 ? SECTIONS.map(({ key, label }) => (
+                  <div key={key} className="modal-section">
+                    <div className="section-label">{label}</div>
+                    {grouped[key].map((src, i) => <ProviderRow key={i} src={src} />)}
                   </div>
-                ) : (
-                  <p className="text-gray-500 text-lg text-center py-8">
-                    No sources available
-                  </p>
+                )) : (
+                  <div className="no-sources">No streaming sources found for this title</div>
                 )}
               </div>
             </div>
@@ -621,266 +473,218 @@
         );
       }
 
-      function SkeletonCard() {
+      // ─── CARD ─────────────────────────────────────────────────────────────────
+      function Card({ item, index, onClick, lastRef }) {
         return (
-          <div className="skeleton w-full h-[300px] md:h-[400px] rounded-2xl"></div>
+          <div
+            className="card"
+            ref={lastRef}
+            onClick={onClick}
+            style={{ animationDelay: `${(index % PER_PAGE) * 0.035}s` }}
+          >
+            <img src={TMDB(item.image)} alt={item.name} loading="lazy" />
+            <div className="card-overlay">
+              <div className="card-title">{item.name.replaceAll('_', ' ')}</div>
+              <div className="card-meta">
+                <span className="badge">{item.type}</span>
+                {item.rating && <span className="badge-rating">⭐ {item.rating}</span>}
+              </div>
+            </div>
+            <div className="play-btn">
+              <svg width="18" height="18" fill="white" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
         );
       }
 
-      function FreeFlix() {
-        const [displayedContent, setDisplayedContent] = useState([]);
-        const [selectedItem, setSelectedItem] = useState(null);
-        const [loading, setLoading] = useState(true);
-        const [loadingMore, setLoadingMore] = useState(false);
-        const [error, setError] = useState(null);
-        const [page, setPage] = useState(1);
-        const [hasMore, setHasMore] = useState(true);
-        const [availableSources, setAvailableSources] = useState([]);
+      // ─── SKELETON ─────────────────────────────────────────────────────────────
+      function SkeletonGrid({ count = PER_PAGE }) {
+        return (
+          <div className="grid">
+            {Array.from({ length: count }).map((_, i) => <div key={i} className="skeleton" />)}
+          </div>
+        );
+      }
 
-        // Filters
-        const [searchQuery, setSearchQuery] = useState("");
-        const [debouncedSearch, setDebouncedSearch] = useState("");
-        const [typeFilter, setTypeFilter] = useState("all");
-        const [sourceFilter, setSourceFilter] = useState("all");
+      // ─── APP ──────────────────────────────────────────────────────────────────
+      function FreeFlix() {
+        const [items, setItems]                 = useState([]);
+        const [selected, setSelected]           = useState(null);
+        const [loading, setLoading]             = useState(true);
+        const [loadingMore, setLoadingMore]     = useState(false);
+        const [error, setError]                 = useState(null);
+        const [page, setPage]                   = useState(1);
+        const [hasMore, setHasMore]             = useState(true);
+        const [totalCount, setTotalCount]       = useState(0);
+        const [sources, setSources]             = useState([]);
+
+        const [search, setSearch]               = useState('');
+        const [debouncedSearch, setDebounced]   = useState('');
+        const [typeFilter, setTypeFilter]       = useState('all');
+        const [sourceFilter, setSourceFilter]   = useState('all');
 
         const observerRef = useRef();
         const lastCardRef = useRef();
-        const itemsPerPage = 12;
 
-        // Debounce search query
+        // Debounce
         useEffect(() => {
-          const timer = setTimeout(() => {
-            setDebouncedSearch(searchQuery);
-          }, 500);
+          const t = setTimeout(() => setDebounced(search), 450);
+          return () => clearTimeout(t);
+        }, [search]);
 
-          return () => clearTimeout(timer);
-        }, [searchQuery]);
-        //
-        // Fetch content from backend
-        const fetchContent = useCallback(
-          (pageNum, append = false, search = "") => {
-            if (append) {
-              setLoadingMore(true);
-            } else {
-              setLoading(true);
-            }
+        // Fetch
+        const fetchItems = useCallback((pageNum, append = false, q = '') => {
+          append ? setLoadingMore(true) : setLoading(true);
+          setError(null);
 
-            const API_BASE_URL =
-              window.ENV && window.ENV.API_URL
-                ? window.ENV.API_URL
-                : "http://127.0.0.1:3000/";
+          const params = new URLSearchParams({ page: pageNum, limit: PER_PAGE });
+          if (q) params.set('search', q);
 
+          fetch(`${API_BASE_URL}?${params}`)
+            .then(res => {
+              if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+              return res.json();
+            })
+            .then(data => {
+              // ── BUG FIX: safely handle different response shapes
+              const incoming = Array.isArray(data)
+                ? data
+                : Array.isArray(data.content)
+                  ? data.content
+                  : [];
 
-            // Build URL with search parameter
-            const searchParam = search
-              ? `&search=${encodeURIComponent(search)}`
-              : "";
-            const url = `https://freeflix-production.up.railway.app/?page=${pageNum}&limit=${itemsPerPage}${searchParam}`;
+              const count = data.count ?? data.total ?? incoming.length;
 
-            fetch(url)
-              .then((res) => {
-                if (!res.ok) throw new Error("Failed to load content");
-                return res.json();
-              })
-              .then((data) => {
-                // Handle the new response format: {count: X, content: [...]}
-                const items = data.content || [];
+              if (append) {
+                setItems(prev => [...prev, ...incoming]);
+              } else {
+                setItems(incoming);
+                setTotalCount(count);
 
-                if (append) {
-                  setDisplayedContent((prev) => [...prev, ...items]);
-                } else {
-                  setDisplayedContent(items);
-
-                  // Extract unique sources from initial load - using 'provider' field
-                  const sources = [
-                    ...new Set(
-                      items.flatMap((item) =>
-                        item.source_info
-                          ? item.source_info.map((s) => s.provider)
-                          : [],
-                      ),
-                    ),
-                  ].sort();
-                  setAvailableSources(sources);
-                }
-
-                // If we got less than itemsPerPage, we've reached the end
-                setHasMore(items.length === itemsPerPage);
-                setLoading(false);
-                setLoadingMore(false);
-                setError(null);
-              })
-              .catch((err) => {
-                console.error("Fetch error:", err);
-                setError(
-                  "Could not load content. Make sure the server is running.",
+                // Build provider list from first page results
+                const seen = new Set();
+                incoming.forEach(item =>
+                  (item.source_info || []).forEach(s => seen.add(s.provider))
                 );
-                setLoading(false);
-                setLoadingMore(false);
-              });
-          },
-          [],
-        );
+                setSources([...seen].sort());
+              }
 
-        // Reset and fetch when filters change
+              // If fewer items than requested, we've hit the end
+              setHasMore(incoming.length === PER_PAGE);
+            })
+            .catch(err => {
+              console.error('Fetch error:', err);
+              setError('Could not reach the server. Please try again.');
+            })
+            .finally(() => {
+              setLoading(false);
+              setLoadingMore(false);
+            });
+        }, []);
+
+        // Reset + fetch on filter/search change
         useEffect(() => {
           setPage(1);
-          setDisplayedContent([]);
+          setItems([]);
           setHasMore(true);
-          fetchContent(1, false, debouncedSearch);
-        }, [debouncedSearch, typeFilter, sourceFilter]);
+          fetchItems(1, false, debouncedSearch);
+        }, [debouncedSearch, typeFilter, sourceFilter, fetchItems]);
 
-        // Load more function
+        // Load next page
         const loadMore = useCallback(() => {
           if (loadingMore || !hasMore || loading) return;
-
-          const nextPage = page + 1;
-          setPage(nextPage);
-          fetchContent(nextPage, true, debouncedSearch);
-        }, [
-          page,
-          hasMore,
-          loadingMore,
-          loading,
-          fetchContent,
-          debouncedSearch,
-        ]);
+          const next = page + 1;
+          setPage(next);
+          fetchItems(next, true, debouncedSearch);
+        }, [page, hasMore, loadingMore, loading, fetchItems, debouncedSearch]);
 
         // Infinite scroll observer
         useEffect(() => {
-          const options = {
-            root: null,
-            rootMargin: "400px",
-            threshold: 0.1,
-          };
-
-          const callback = (entries) => {
-            if (entries[0].isIntersecting) {
-              loadMore();
-            }
-          };
-
-          observerRef.current = new IntersectionObserver(callback, options);
-
-          if (lastCardRef.current) {
-            observerRef.current.observe(lastCardRef.current);
-          }
-
-          return () => {
-            if (observerRef.current) {
-              observerRef.current.disconnect();
-            }
-          };
+          observerRef.current = new IntersectionObserver(
+            entries => { if (entries[0].isIntersecting) loadMore(); },
+            { rootMargin: '350px' }
+          );
+          if (lastCardRef.current) observerRef.current.observe(lastCardRef.current);
+          return () => observerRef.current?.disconnect();
         }, [loadMore]);
 
-        // Client-side filtering (type and source only, search handled by backend)
-        const filteredContent = displayedContent.filter((item) => {
-          // Type filter
-          if (typeFilter !== "all" && item.type !== typeFilter) {
-            return false;
+        // ── CLIENT-SIDE FILTER ────────────────────────────────────────────────
+        // BUG FIX: previously items would flicker to "no content" when filter
+        // changed before new data arrived. Now we only show empty state when
+        // loading is fully done AND filtered result is truly empty.
+        const filtered = items.filter(item => {
+          if (typeFilter !== 'all' && item.type !== typeFilter) return false;
+          if (sourceFilter !== 'all') {
+            const providers = (item.source_info || []).map(s => s.provider);
+            if (!providers.includes(sourceFilter)) return false;
           }
-
-          // Source filter - using 'provider' field
-          if (sourceFilter !== "all") {
-            if (!item.source_info || item.source_info.length === 0)
-              return false;
-            const hasSource = item.source_info.some(
-              (s) => s.provider === sourceFilter,
-            );
-            if (!hasSource) return false;
-          }
-
           return true;
         });
 
+        const showEmpty = !loading && !loadingMore && !error && filtered.length === 0;
+
+        // Dynamic header height for main padding
+        const headerHeight = 'calc(178px + 16px)';
+
         return (
-          <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
-            {/* Fixed Header */}
-            <header className="header-glow fixed w-full z-40 px-4 md:px-8 py-4 md:py-5">
-              <div className="max-w-7xl mx-auto">
-                <div className="flex items-center justify-between mb-6">
-                  <h1 className="text-3xl md:text-4xl font-black tracking-tight">
-                    <span className="text-red-600">FREE</span>
-                    <span className="text-white">FLIX</span>
-                  </h1>
-                  <div className="text-xs md:text-sm text-gray-400 font-semibold uppercase tracking-wider">
-                    Premium Entertainment
-                  </div>
+          <div style={{ minHeight: '100vh' }}>
+
+            {/* ── HEADER ── */}
+            <header className="header">
+              <div className="header-inner">
+                <div className="header-top">
+                  <div className="logo"><span className="r">FREE</span><span className="w">FLIX</span></div>
+                  {totalCount > 0 && (
+                    <div className="stats-pill">{totalCount.toLocaleString()} titles</div>
+                  )}
                 </div>
 
-                {/* Search Bar */}
-                <div className="mb-4">
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="Search movies & series..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="search-input w-full px-5 py-3 md:py-4 rounded-xl text-white placeholder-gray-500 pr-12"
-                    />
-                    <svg
-                      className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                <div className="search-wrap">
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search movies & series..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                  />
+                  <svg className="search-icon" width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+
+                <div className="filters">
+                  {[
+                    { val: 'all',    label: 'All' },
+                    { val: 'movie',  label: '🎬 Movies' },
+                    { val: 'series', label: '📺 Series' },
+                  ].map(({ val, label }) => (
+                    <button
+                      key={val}
+                      className={`filter-btn ${typeFilter === val ? 'active' : ''}`}
+                      onClick={() => setTypeFilter(val)}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
-                    </svg>
-                  </div>
-                </div>
+                      {label}
+                    </button>
+                  ))}
 
-                {/* Filters */}
-                <div className="flex gap-3 overflow-x-auto pb-2">
-                  <button
-                    onClick={() => setTypeFilter("all")}
-                    className={`filter-button px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap ${
-                      typeFilter === "all" ? "active" : ""
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => setTypeFilter("movie")}
-                    className={`filter-button px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap ${
-                      typeFilter === "movie" ? "active" : ""
-                    }`}
-                  >
-                    Movies
-                  </button>
-                  <button
-                    onClick={() => setTypeFilter("series")}
-                    className={`filter-button px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap ${
-                      typeFilter === "series" ? "active" : ""
-                    }`}
-                  >
-                    Series
-                  </button>
-
-                  {availableSources.length > 0 && (
+                  {sources.length > 0 && (
                     <>
-                      <div className="w-px bg-gray-700 mx-2"></div>
+                      <div className="filter-sep" />
                       <button
-                        onClick={() => setSourceFilter("all")}
-                        className={`filter-button px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap ${
-                          sourceFilter === "all" ? "active" : ""
-                        }`}
+                        className={`filter-btn ${sourceFilter === 'all' ? 'active' : ''}`}
+                        onClick={() => setSourceFilter('all')}
                       >
                         All Sources
                       </button>
-                      {availableSources.map((source) => (
+                      {sources.map(src => (
                         <button
-                          key={source}
-                          onClick={() => setSourceFilter(source)}
-                          className={`filter-button px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap ${
-                            sourceFilter === source ? "active" : ""
-                          }`}
+                          key={src}
+                          className={`filter-btn ${sourceFilter === src ? 'active' : ''}`}
+                          onClick={() => setSourceFilter(src)}
                         >
-                          {source}
+                          {src}
                         </button>
                       ))}
                     </>
@@ -889,126 +693,58 @@
               </div>
             </header>
 
-            {/* Content Grid */}
-            <main className="relative z-10 pt-56 md:pt-64 pb-20 px-4 md:px-8">
-              <div className="max-w-7xl mx-auto">
-                {loading && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                    {[...Array(12)].map((_, i) => (
-                      <SkeletonCard key={i} />
-                    ))}
-                  </div>
-                )}
+            {/* ── MAIN ── */}
+            <main className="main" style={{ paddingTop: headerHeight }}>
 
-                {error && (
-                  <div className="error-container rounded-2xl p-6 text-red-300 font-semibold flex items-center gap-3">
-                    <svg
-                      className="w-6 h-6 flex-shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
-                    </svg>
-                    <span>{error}</span>
-                  </div>
-                )}
+              {loading && <SkeletonGrid count={PER_PAGE} />}
 
-                {!loading && !error && filteredContent.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-                    {filteredContent.map((item, index) => (
-                      <div
-                        key={`${item.name}-${index}`}
-                        ref={
-                          index === filteredContent.length - 1
-                            ? lastCardRef
-                            : null
-                        }
-                        onClick={() => setSelectedItem(item)}
-                        className="card relative w-full h-[300px] md:h-[400px] rounded-2xl overflow-hidden cursor-pointer shadow-xl fade-in"
-                        style={{ animationDelay: `${(index % 12) * 0.05}s` }}
-                      >
-                        <img
-                          src={"https://image.tmdb.org/t/p/w500" + item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
+              {error && (
+                <div className="error-box">
+                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+                  </svg>
+                  {error}
+                </div>
+              )}
 
-                        <div className="card-shine"></div>
+              {!loading && !error && filtered.length > 0 && (
+                <div className="grid">
+                  {filtered.map((item, i) => (
+                    <Card
+                      key={`${item.name}-${i}`}
+                      item={item}
+                      index={i}
+                      onClick={() => setSelected(item)}
+                      lastRef={i === filtered.length - 1 ? lastCardRef : null}
+                    />
+                  ))}
+                </div>
+              )}
 
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 hover:opacity-100 transition duration-300 flex flex-col justify-end p-4">
-                          <p className="font-bold text-sm md:text-base leading-snug text-white text-fixed-2">
-                            {item.name.replaceAll("_", " ")}
-                          </p>
-                          <div className="flex gap-2 mt-3 items-center flex-wrap">
-                            <span className="badge-style text-white text-xs">
-                              {item.type.charAt(0).toUpperCase() +
-                                item.type.slice(1)}
-                            </span>
-                            {item.rating && (
-                              <span className="rating-style flex items-center gap-1 text-xs">
-                                ⭐ {item.rating}
-                              </span>
-                            )}
-                          </div>
-                        </div>
+              {showEmpty && (
+                <div className="empty">
+                  <div className="empty-icon">🔍</div>
+                  <h3>No results found</h3>
+                  <p>Try a different search term or clear your filters</p>
+                </div>
+              )}
 
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition duration-300">
-                          <div className="play-overlay rounded-full p-4">
-                            <svg
-                              className="w-7 h-7 md:w-8 md:h-8 text-white"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              {loadingMore && (
+                <div className="load-wrap"><div className="spinner" /></div>
+              )}
 
-                {!loading && !error && filteredContent.length === 0 && (
-                  <div className="text-center py-20">
-                    <div className="text-6xl mb-4">🔍</div>
-                    <p className="text-xl text-gray-500 font-normal">
-                      No content found. Try different filters.
-                    </p>
-                  </div>
-                )}
+              {!loading && !loadingMore && !hasMore && filtered.length > 0 && (
+                <div className="end-msg">You've seen it all 🎬</div>
+              )}
 
-                {/* Loading more indicator */}
-                {loadingMore && (
-                  <div className="flex justify-center mt-8">
-                    <div className="flex items-center gap-3 text-gray-400">
-                      <div className="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="font-semibold">Loading more...</span>
-                    </div>
-                  </div>
-                )}
-
-                {/* End of content message */}
-                {!loading &&
-                  !loadingMore &&
-                  !hasMore &&
-                  filteredContent.length > 0 && (
-                    <div className="text-center mt-12 pb-8">
-                      <div className="h-px premium-divider mb-6"></div>
-                      <p className="text-gray-500 font-semibold">
-                        You've reached the end 🎬
-                      </p>
-                    </div>
-                  )}
-              </div>
             </main>
 
-            {/* Modal */}
-            <Modal item={selectedItem} onClose={() => setSelectedItem(null)} />
+            {selected && <Modal item={selected} onClose={() => setSelected(null)} />}
           </div>
         );
       }
 
-      ReactDOM.createRoot(document.getElementById("root")).render(<FreeFlix />);
+      ReactDOM.createRoot(document.getElementById('root')).render(<FreeFlix />);
     </script>
   </body>
 </html>
