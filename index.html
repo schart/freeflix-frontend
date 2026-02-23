@@ -675,7 +675,7 @@
             const searchParam = search
               ? `&search=${encodeURIComponent(search)}`
               : "";
-            const url = `${API_BASE_URL}?page=${pageNum}&limit=${itemsPerPage}${searchParam}`;
+            const url = `https://freeflix-production.up.railway.app/?page=${pageNum}&limit=${itemsPerPage}${searchParam}`;
 
             fetch(url)
               .then((res) => {
