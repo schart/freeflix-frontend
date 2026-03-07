@@ -8,986 +8,502 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
-
     <style>
       :root {
-        --accent: #c8c8c8;
-        --accent-glow: rgba(200, 200, 200, 0.12);
-        --bg: #080808;
-        --surface: #111;
-        --surface2: #161616;
-        --surface3: #1e1e1e;
-        --border: rgba(255, 255, 255, 0.07);
-        --border-accent: rgba(255, 255, 255, 0.18);
-        --text: #efefef;
-        --text-dim: #888;
-        --text-muted: #3a3a3a;
-        --gold: #f5c518;
-        --affiliate-glow: rgba(245, 197, 24, 0.08);
-        --grid-cols: 6;
-        --ai-color: #a78bfa;
-        --ai-glow: rgba(167, 139, 250, 0.15);
+        --bg:#080808; --surface:#111; --surface2:#161616; --surface3:#1e1e1e;
+        --border:rgba(255,255,255,0.07); --border-accent:rgba(255,255,255,0.18);
+        --text:#efefef; --text-dim:#888; --text-muted:#3a3a3a;
+        --gold:#f5c518; --grid-cols:6;
+        --ai:#a78bfa; --ai-bg:rgba(167,139,250,0.08); --ai-border:rgba(167,139,250,0.2);
       }
+      *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+      html{scroll-behavior:smooth}
+      body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+      body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35}
+      ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:99px}
 
-      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
-      body {
-        font-family: "DM Sans", sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        overflow-x: hidden;
-        min-height: 100vh;
-      }
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        z-index: 0;
-        pointer-events: none;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-        opacity: 0.35;
-      }
-      ::-webkit-scrollbar { width: 4px; }
-      ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 99px; }
+      /* HEADER */
+      #header{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(8,8,8,.94);backdrop-filter:blur(28px) saturate(160%);-webkit-backdrop-filter:blur(28px) saturate(160%);border-bottom:1px solid var(--border);transition:box-shadow .3s}
+      #header.scrolled{box-shadow:0 4px 40px rgba(0,0,0,.6)}
+      .header-inner{max-width:1440px;margin:0 auto;padding:13px 24px;display:flex;flex-direction:column;gap:10px}
+      .header-top{display:flex;align-items:center;gap:14px}
+      .logo{font-family:"Bebas Neue",sans-serif;font-size:1.7rem;letter-spacing:5px;line-height:1;user-select:none;cursor:pointer;flex-shrink:0;transition:opacity .15s}
+      .logo:hover{opacity:.75}
+      .logo-dim{color:rgba(255,255,255,.35)}.logo-white{color:#fff}
 
-      /* ─── HEADER ─── */
-      #header {
-        position: fixed; top: 0; left: 0; right: 0; z-index: 50;
-        background: rgba(8,8,8,0.94);
-        backdrop-filter: blur(28px) saturate(160%);
-        -webkit-backdrop-filter: blur(28px) saturate(160%);
-        border-bottom: 1px solid var(--border);
-      }
-      .header-inner {
-        max-width: 1440px; margin: 0 auto;
-        padding: 13px 24px;
-        display: flex; flex-direction: column; gap: 10px;
-      }
-      .header-top { display: flex; align-items: center; gap: 14px; }
-      .logo {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 1.7rem; letter-spacing: 5px; line-height: 1;
-        user-select: none; cursor: pointer; flex-shrink: 0;
-        transition: opacity 0.15s;
-      }
-      .logo:hover { opacity: 0.75; }
-      .logo-dim { color: rgba(255,255,255,0.35); }
-      .logo-white { color: #fff; }
+      /* SEARCH */
+      .search-wrap{position:relative;flex:0 1 440px;margin-left:auto}
+      .search-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 84px 9px 38px;color:var(--text);font-family:"DM Sans",sans-serif;font-size:.83rem;outline:none;transition:border-color .2s,box-shadow .2s,background .2s}
+      .search-input::placeholder{color:transparent}
+      .search-input:focus,.search-input.active{border-color:rgba(167,139,250,.45);box-shadow:0 0 0 3px rgba(167,139,250,.09);background:var(--surface3)}
+      .search-icon-left{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.22);pointer-events:none;transition:color .2s}
+      .search-wrap:focus-within .search-icon-left{color:var(--ai)}
+      .ai-badge{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(167,139,250,.08));border:1px solid rgba(167,139,250,.25);border-radius:6px;padding:3px 8px;font-size:.58rem;font-weight:700;letter-spacing:.8px;color:var(--ai);text-transform:uppercase;white-space:nowrap;pointer-events:none;display:flex;align-items:center;gap:4px}
+      .ai-dot{width:5px;height:5px;border-radius:50%;background:var(--ai);animation:aiPulse 2s ease infinite}
+      @keyframes aiPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+      .search-hint{position:absolute;left:38px;top:50%;transform:translateY(-50%);font-size:.83rem;color:var(--text-muted);pointer-events:none;white-space:nowrap;overflow:hidden}
+      .hint-inner{display:inline-block;animation:hintSlide .3s cubic-bezier(.25,.46,.45,.94) both}
+      @keyframes hintSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-      /* ─── AI SEARCH BOX ─── */
-      .search-wrap {
-        position: relative; flex: 0 1 420px; margin-left: auto;
-      }
-      .search-input {
-        width: 100%;
-        background: var(--surface2);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 9px 80px 9px 38px;
-        color: var(--text);
-        font-family: "DM Sans", sans-serif;
-        font-size: 0.83rem;
-        outline: none;
-        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      }
-      .search-input::placeholder { color: var(--text-muted); }
-      .search-input:focus {
-        border-color: rgba(167,139,250,0.4);
-        box-shadow: 0 0 0 3px rgba(167,139,250,0.08);
-        background: var(--surface3);
-      }
-      .search-input.ai-active {
-        border-color: rgba(167,139,250,0.4);
-        box-shadow: 0 0 0 3px rgba(167,139,250,0.08);
-      }
-      .search-icon-left {
-        position: absolute; left: 11px; top: 50%;
-        transform: translateY(-50%); color: rgba(255,255,255,0.22);
-        pointer-events: none; transition: color 0.2s;
-      }
-      .search-input:focus ~ .search-icon-left,
-      .search-wrap:focus-within .search-icon-left { color: var(--ai-color); }
+      /* SEARCH DROPDOWN */
+      .search-dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:400;background:var(--surface);border:1px solid var(--border-accent);border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.8);animation:dropIn .18s cubic-bezier(.25,.46,.45,.94)}
+      @keyframes dropIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+      .dd-label{font-size:.55rem;font-weight:800;text-transform:uppercase;letter-spacing:2.5px;color:var(--text-muted);padding:10px 14px 6px;display:flex;align-items:center;gap:8px}
+      .dd-label::after{content:"";flex:1;height:1px;background:var(--border)}
+      .dd-item{display:flex;align-items:center;gap:10px;padding:7px 14px;cursor:pointer;transition:background .1s;border:none;background:none;width:100%;text-align:left}
+      .dd-item:hover{background:rgba(255,255,255,.04)}
+      .dd-item:last-of-type{margin-bottom:4px}
+      .dd-ico{width:24px;height:24px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.7rem}
+      .dd-ico.hist{background:rgba(255,255,255,.05);color:var(--text-muted)}
+      .dd-ico.sugg{background:var(--ai-bg);color:var(--ai)}
+      .dd-text{font-size:.8rem;color:var(--text-dim);flex:1;text-align:left}
+      .dd-item:hover .dd-text{color:var(--text)}
+      .dd-remove{width:18px;height:18px;border-radius:4px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);opacity:0;transition:opacity .12s,color .12s;font-size:.62rem;line-height:1}
+      .dd-item:hover .dd-remove{opacity:1}
+      .dd-remove:hover{color:var(--text-dim);background:rgba(255,255,255,.06)}
+      .dd-clear{width:100%;padding:8px 14px;background:none;border:none;border-top:1px solid var(--border);cursor:pointer;font-size:.68rem;color:var(--text-muted);text-align:center;transition:color .12s,background .12s}
+      .dd-clear:hover{color:var(--text-dim);background:rgba(255,255,255,.02)}
 
-      .ai-badge {
-        position: absolute; right: 8px; top: 50%;
-        transform: translateY(-50%);
-        background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.08));
-        border: 1px solid rgba(167,139,250,0.25);
-        border-radius: 6px;
-        padding: 3px 8px;
-        font-size: 0.58rem;
-        font-weight: 700;
-        letter-spacing: 0.8px;
-        color: var(--ai-color);
-        text-transform: uppercase;
-        white-space: nowrap;
-        pointer-events: none;
-        display: flex; align-items: center; gap: 4px;
-      }
-      .ai-dot {
-        width: 5px; height: 5px; border-radius: 50%;
-        background: var(--ai-color);
-        animation: aiPulse 2s ease infinite;
-      }
-      @keyframes aiPulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(0.7); }
-      }
+      .search-count{font-size:.68rem;font-weight:500;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
+      .header-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+      .icon-btn{width:32px;height:32px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);transition:all .15s ease;flex-shrink:0}
+      .icon-btn:hover{border-color:var(--border-accent);color:var(--text);background:var(--surface3)}
+      .icon-btn.active{background:#fff;border-color:#fff;color:#000}
+      .roulette-btn{padding:0 12px;width:auto;gap:6px;font-size:.72rem;font-weight:600;letter-spacing:.4px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);height:32px;white-space:nowrap;transition:all .15s ease}
+      .roulette-btn:hover{border-color:var(--border-accent);color:var(--text);background:var(--surface3)}
 
-      /* Animated placeholder suggestions */
-      .search-placeholder-hint {
-        position: absolute; left: 38px; top: 50%;
-        transform: translateY(-50%);
-        font-size: 0.83rem; color: var(--text-muted);
-        pointer-events: none;
-        overflow: hidden;
-        white-space: nowrap;
-      }
-      .hint-text {
-        display: inline-block;
-        animation: hintCycle 12s ease infinite;
-      }
-      @keyframes hintCycle {
-        0%, 18%   { opacity: 1; transform: translateY(0); }
-        20%, 22%  { opacity: 0; transform: translateY(-8px); }
-        24%       { opacity: 0; transform: translateY(8px); }
-        26%, 44%  { opacity: 1; transform: translateY(0); }
-        46%, 48%  { opacity: 0; transform: translateY(-8px); }
-        50%       { opacity: 0; transform: translateY(8px); }
-        52%, 70%  { opacity: 1; transform: translateY(0); }
-        72%, 74%  { opacity: 0; transform: translateY(-8px); }
-        76%       { opacity: 0; transform: translateY(8px); }
-        78%, 96%  { opacity: 1; transform: translateY(0); }
-        98%, 100% { opacity: 0; transform: translateY(-8px); }
-      }
+      /* FILTER BAR */
+      .filter-bar{display:flex;gap:4px;overflow-x:auto;padding-bottom:1px;scrollbar-width:none;align-items:center}
+      .filter-bar::-webkit-scrollbar{display:none}
+      .fsep{width:1px;flex-shrink:0;margin:0 4px;background:rgba(255,255,255,.07);align-self:stretch}
+      .fbtn{flex-shrink:0;padding:4px 12px;border-radius:6px;font-family:"DM Sans",sans-serif;font-size:.72rem;font-weight:600;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);cursor:pointer;transition:all .15s ease;white-space:nowrap}
+      .fbtn:hover{border-color:var(--border-accent);color:var(--text);background:var(--surface3)}
+      .fbtn.on{background:#fff;border-color:#fff;color:#000}
+      .sort-label{font-size:.68rem;font-weight:500;color:var(--text-muted);margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:6px}
+      .sort-select{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-dim);font-family:"DM Sans",sans-serif;font-size:.72rem;padding:3px 8px;outline:none;cursor:pointer;transition:all .15s}
+      .sort-select:hover,.sort-select:focus{border-color:var(--border-accent);color:var(--text)}
 
-      .search-count {
-        font-size: 0.68rem; font-weight: 500; color: var(--text-muted);
-        white-space: nowrap; flex-shrink: 0; transition: opacity 0.2s;
-      }
-      .header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-      .icon-btn {
-        width: 32px; height: 32px; border-radius: 8px;
-        background: var(--surface2); border: 1px solid var(--border);
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: var(--text-dim);
-        transition: all 0.15s ease; flex-shrink: 0;
-      }
-      .icon-btn:hover { border-color: var(--border-accent); color: var(--text); background: var(--surface3); }
-      .icon-btn.active { background: #fff; border-color: #fff; color: #000; }
+      /* AI BANNER */
+      .ai-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(167,139,250,.03));border:1px solid rgba(167,139,250,.14);margin-bottom:16px;animation:bannerIn .3s ease}
+      @keyframes bannerIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+      .ai-banner-icon{width:28px;height:28px;border-radius:7px;background:var(--ai-bg);border:1px solid var(--ai-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem}
+      .ai-banner-text{flex:1}
+      .ai-banner-title{font-size:.75rem;font-weight:600;color:var(--ai);margin-bottom:2px}
+      .ai-banner-sub{font-size:.68rem;color:var(--text-muted)}
+      .ai-banner-count{font-family:"Bebas Neue",sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--ai);line-height:1}
 
-      .roulette-btn {
-        padding: 0 12px; width: auto; gap: 6px;
-        font-size: 0.72rem; font-weight: 600; letter-spacing: 0.4px;
-        border-radius: 8px; background: var(--surface2); border: 1px solid var(--border);
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: var(--text-dim); height: 32px;
-        white-space: nowrap; transition: all 0.15s ease;
-      }
-      .roulette-btn:hover { border-color: var(--border-accent); color: var(--text); background: var(--surface3); }
+      /* SETTINGS */
+      .settings-panel{position:fixed;top:0;right:0;bottom:0;z-index:300;width:300px;background:var(--surface);border-left:1px solid var(--border);backdrop-filter:blur(20px);padding:24px 20px;display:flex;flex-direction:column;gap:0;animation:slideIn .25s cubic-bezier(.25,.46,.45,.94);overflow-y:auto}
+      @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+      .settings-overlay{position:fixed;inset:0;z-index:299;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);animation:mfade .2s ease}
+      .settings-title{font-family:"Bebas Neue",sans-serif;font-size:1.2rem;letter-spacing:3px;color:var(--text);margin-bottom:24px;display:flex;justify-content:space-between;align-items:center}
+      .settings-close{width:28px;height:28px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);font-size:.75rem;transition:all .15s}
+      .settings-close:hover{background:var(--surface3);color:var(--text)}
+      .settings-section{margin-bottom:28px}
+      .settings-section-title{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:var(--text-muted);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+      .settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+      .settings-row-label{font-size:.82rem;font-weight:500;color:var(--text-dim)}
+      .settings-row-sub{font-size:.7rem;color:var(--text-muted);margin-top:2px}
+      .toggle{width:36px;height:20px;border-radius:99px;background:var(--surface3);border:1px solid var(--border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+      .toggle.on{background:#fff;border-color:#fff}
+      .toggle::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--text-muted);transition:transform .2s,background .2s}
+      .toggle.on::after{transform:translateX(16px);background:#000}
+      .grid-slider{-webkit-appearance:none;width:100%;height:3px;background:var(--surface3);border-radius:99px;outline:none;cursor:pointer;margin-top:12px}
+      .grid-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+      .region-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text-dim);font-family:"DM Sans",sans-serif;font-size:.8rem;padding:8px 10px;outline:none;cursor:pointer;margin-top:10px;transition:all .15s}
+      .region-select:hover,.region-select:focus{border-color:var(--border-accent);color:var(--text)}
+      .affiliate-info{background:rgba(245,197,24,.08);border:1px solid rgba(245,197,24,.12);border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.68rem;color:rgba(245,197,24,.6);line-height:1.5;display:flex;gap:8px;align-items:flex-start}
 
-      .filter-bar {
-        display: flex; gap: 4px; overflow-x: auto; padding-bottom: 1px;
-        scrollbar-width: none; align-items: center;
-      }
-      .filter-bar::-webkit-scrollbar { display: none; }
-      .fsep { width: 1px; flex-shrink: 0; margin: 0 4px; background: rgba(255,255,255,0.07); align-self: stretch; }
-      .fbtn {
-        flex-shrink: 0; padding: 4px 12px; border-radius: 6px;
-        font-family: "DM Sans", sans-serif; font-size: 0.72rem; font-weight: 600;
-        border: 1px solid var(--border); background: var(--surface2);
-        color: var(--text-dim); cursor: pointer; transition: all 0.15s ease; white-space: nowrap;
-      }
-      .fbtn:hover { border-color: var(--border-accent); color: var(--text); background: var(--surface3); }
-      .fbtn.on { background: #fff; border-color: #fff; color: #000; }
-      .sort-label {
-        font-size: 0.68rem; font-weight: 500; color: var(--text-muted);
-        margin-left: auto; flex-shrink: 0; display: flex; align-items: center; gap: 6px;
-      }
-      .sort-select {
-        background: var(--surface2); border: 1px solid var(--border);
-        border-radius: 6px; color: var(--text-dim);
-        font-family: "DM Sans", sans-serif; font-size: 0.72rem;
-        padding: 3px 8px; outline: none; cursor: pointer; transition: all 0.15s;
-      }
-      .sort-select:hover, .sort-select:focus { border-color: var(--border-accent); color: var(--text); }
+      /* MAIN */
+      #main{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:0 20px 100px}
+      .grid{display:grid;grid-template-columns:repeat(var(--grid-cols,2),1fr);gap:8px}
+      @media(min-width:480px){:root{--grid-cols:3}}
+      @media(min-width:720px){:root{--grid-cols:4}}
+      @media(min-width:980px){:root{--grid-cols:5}}
+      @media(min-width:1220px){:root{--grid-cols:6}}
+      @media(min-width:1440px){:root{--grid-cols:7}}
 
-      /* ─── AI SEARCH RESULT BANNER ─── */
-      .ai-result-banner {
-        display: flex; align-items: center; gap: 10px;
-        padding: 10px 14px; border-radius: 10px;
-        background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(167,139,250,0.04));
-        border: 1px solid rgba(167,139,250,0.15);
-        margin-bottom: 16px;
-        animation: bannerIn 0.3s ease;
-      }
-      @keyframes bannerIn {
-        from { opacity: 0; transform: translateY(-6px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .ai-result-icon {
-        width: 28px; height: 28px; border-radius: 7px;
-        background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.2);
-        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-        font-size: 0.85rem;
-      }
-      .ai-result-text { flex: 1; }
-      .ai-result-title { font-size: 0.75rem; font-weight: 600; color: var(--ai-color); margin-bottom: 2px; }
-      .ai-result-sub { font-size: 0.68rem; color: var(--text-muted); }
-      .ai-result-count {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 1.4rem; letter-spacing: 2px; color: var(--ai-color);
-        line-height: 1;
-      }
+      /* CARD */
+      .card{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:2/3;background:var(--surface2);animation:cardIn .38s ease both;isolation:isolate;transition:transform .28s cubic-bezier(.25,.46,.45,.94),box-shadow .28s}
+      @keyframes cardIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+      .card::after{content:"";position:absolute;inset:0;border-radius:10px;border:1px solid rgba(255,255,255,0);transition:border-color .25s;pointer-events:none;z-index:3}
+      .card:hover::after{border-color:rgba(255,255,255,.22)}
+      .card:hover{box-shadow:0 20px 60px rgba(0,0,0,.7);transform:translateY(-4px) scale(1.035)}
+      .card-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s ease}
+      .card:hover .card-img{transform:scale(1.06)}
+      .card-img-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--surface3);gap:8px;color:var(--text-muted);font-size:.7rem;font-weight:600;text-align:center;padding:16px}
+      .card-grad{position:absolute;inset:0;z-index:1;background:linear-gradient(to top,rgba(0,0,0,.96) 0%,rgba(0,0,0,.5) 38%,transparent 65%);opacity:0;transition:opacity .25s ease}
+      .card:hover .card-grad{opacity:1}
+      .card-info{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:12px 10px 10px;transform:translateY(6px);opacity:0;transition:all .25s ease}
+      .card:hover .card-info{opacity:1;transform:translateY(0)}
+      .card-name{font-size:.75rem;font-weight:700;color:#fff;line-height:1.25;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+      .card-badges{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+      .cbadge{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:2px 6px;border-radius:3px}
+      .cbadge-type{background:rgba(255,255,255,.15);color:#fff}
+      .cbadge-rating{background:rgba(245,197,24,.15);color:#f5c518;border:1px solid rgba(245,197,24,.2)}
+      .cbadge-year{background:rgba(100,200,255,.12);color:#64c8ff;border:1px solid rgba(100,200,255,.2)}
+      .card-ai{position:absolute;top:8px;left:8px;z-index:4;font-size:.56rem;font-weight:800;letter-spacing:.4px;background:linear-gradient(135deg,rgba(167,139,250,.9),rgba(139,92,246,.9));color:#fff;padding:2px 7px;border-radius:99px;backdrop-filter:blur(6px);border:1px solid rgba(167,139,250,.4);opacity:0;transition:opacity .2s}
+      .card:hover .card-ai{opacity:1}
+      .card-play{position:absolute;top:50%;left:50%;z-index:2;transform:translate(-50%,-50%) scale(.6);width:44px;height:44px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .25s cubic-bezier(.34,1.56,.64,1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25)}
+      .card:hover .card-play{opacity:1;transform:translate(-50%,-50%) scale(1)}
+      .card-src{position:absolute;top:8px;right:8px;z-index:4;font-size:.6rem;font-weight:700;background:rgba(0,0,0,.7);color:var(--text-dim);border:1px solid rgba(255,255,255,.1);padding:2px 7px;border-radius:99px;backdrop-filter:blur(6px);opacity:0;transition:opacity .2s}
+      .card:hover .card-src{opacity:1}
 
-      /* ─── SETTINGS PANEL ─── */
-      .settings-panel {
-        position: fixed; top: 0; right: 0; bottom: 0; z-index: 300;
-        width: 300px; background: var(--surface); border-left: 1px solid var(--border);
-        backdrop-filter: blur(20px); padding: 24px 20px;
-        display: flex; flex-direction: column; gap: 0;
-        animation: slideInRight 0.25s cubic-bezier(0.25,0.46,0.45,0.94);
-        overflow-y: auto;
-      }
-      @keyframes slideInRight {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      .settings-overlay {
-        position: fixed; inset: 0; z-index: 299;
-        background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
-        animation: mfade 0.2s ease;
-      }
-      .settings-title {
-        font-family: "Bebas Neue", sans-serif;
-        font-size: 1.2rem; letter-spacing: 3px; color: var(--text);
-        margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;
-      }
-      .settings-close {
-        width: 28px; height: 28px; border-radius: 6px;
-        background: var(--surface2); border: 1px solid var(--border);
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: var(--text-dim); font-size: 0.75rem; transition: all 0.15s;
-      }
-      .settings-close:hover { background: var(--surface3); color: var(--text); }
-      .settings-section { margin-bottom: 28px; }
-      .settings-section-title {
-        font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 2.5px; color: var(--text-muted);
-        margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
-      }
-      .settings-row {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
-      }
-      .settings-row-label { font-size: 0.82rem; font-weight: 500; color: var(--text-dim); }
-      .settings-row-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
-      .toggle {
-        width: 36px; height: 20px; border-radius: 99px;
-        background: var(--surface3); border: 1px solid var(--border);
-        position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
-      }
-      .toggle.on { background: #fff; border-color: #fff; }
-      .toggle::after {
-        content: ""; position: absolute; top: 2px; left: 2px;
-        width: 14px; height: 14px; border-radius: 50%;
-        background: var(--text-muted);
-        transition: transform 0.2s, background 0.2s;
-      }
-      .toggle.on::after { transform: translateX(16px); background: #000; }
-      .grid-slider {
-        -webkit-appearance: none; width: 100%; height: 3px;
-        background: var(--surface3); border-radius: 99px; outline: none; cursor: pointer; margin-top: 12px;
-      }
-      .grid-slider::-webkit-slider-thumb {
-        -webkit-appearance: none; width: 16px; height: 16px;
-        border-radius: 50%; background: #fff; cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-      }
-      .region-select {
-        width: 100%; background: var(--surface2); border: 1px solid var(--border);
-        border-radius: 7px; color: var(--text-dim);
-        font-family: "DM Sans", sans-serif; font-size: 0.8rem;
-        padding: 8px 10px; outline: none; cursor: pointer; margin-top: 10px; transition: all 0.15s;
-      }
-      .region-select:hover, .region-select:focus { border-color: var(--border-accent); color: var(--text); }
+      /* SKELETON */
+      .skel{aspect-ratio:2/3;border-radius:10px;background:linear-gradient(100deg,#0d0d0d 0%,#1c1c1c 50%,#0d0d0d 100%);background-size:300% 100%;animation:skel 1.8s ease infinite}
+      @keyframes skel{0%{background-position:100% 50%}100%{background-position:-100% 50%}}
 
-      /* ─── AFFILIATE INFO BOX ─── */
-      .affiliate-info {
-        background: var(--affiliate-glow);
-        border: 1px solid rgba(245,197,24,0.12);
-        border-radius: 8px;
-        padding: 10px 12px;
-        margin-top: 8px;
-        font-size: 0.68rem;
-        color: rgba(245,197,24,0.6);
-        line-height: 1.5;
-        display: flex;
-        gap: 8px;
-        align-items: flex-start;
-      }
+      /* STATE */
+      .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:12px;color:var(--text-muted);text-align:center}
+      .state-icon{font-size:3rem}.state-title{font-size:1rem;font-weight:600;color:var(--text-dim)}.state-sub{font-size:.825rem}
+      .ai-empty{display:flex;flex-direction:column;align-items:center;padding:60px 20px;gap:16px;text-align:center}
+      .ai-empty-icon{width:64px;height:64px;border-radius:16px;background:var(--ai-bg);border:1px solid var(--ai-border);display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+      .ai-empty-title{font-size:1rem;font-weight:600;color:var(--text-dim)}
+      .ai-empty-sub{font-size:.8rem;color:var(--text-muted);max-width:320px;line-height:1.6}
+      .ai-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+      .ai-chip{padding:6px 14px;border-radius:99px;background:var(--ai-bg);border:1px solid var(--ai-border);color:var(--ai);font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s}
+      .ai-chip:hover{background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.35)}
+      .err-box{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:16px 18px;color:#aaa;font-size:.85rem;font-weight:500;display:flex;align-items:center;gap:10px}
+      .load-row{display:flex;justify-content:center;padding:24px 0}
+      .spin{width:20px;height:20px;border:2px solid rgba(255,255,255,.08);border-top-color:rgba(255,255,255,.4);border-radius:50%;animation:spin .65s linear infinite}
+      @keyframes spin{to{transform:rotate(360deg)}}
+      .end-line{display:flex;align-items:center;gap:14px;padding:28px 0;color:var(--text-muted);font-size:.78rem;font-weight:500}
+      .end-line::before,.end-line::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent)}
 
-      /* ─── MAIN ─── */
-      #main {
-        position: relative; z-index: 1;
-        max-width: 1440px; margin: 0 auto; padding: 0 20px 100px;
-      }
+      /* MODAL */
+      .mbg{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.88);backdrop-filter:blur(24px) saturate(140%);-webkit-backdrop-filter:blur(24px) saturate(140%);display:flex;align-items:center;justify-content:center;padding:16px;animation:mfade .2s ease}
+      @keyframes mfade{from{opacity:0}to{opacity:1}}
+      .mbox{background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:20px;width:100%;max-width:660px;max-height:90vh;overflow-y:auto;position:relative;animation:mslide .3s cubic-bezier(.25,.46,.45,.94);scrollbar-width:none;box-shadow:0 40px 80px rgba(0,0,0,.7)}
+      .mbox::-webkit-scrollbar{display:none}
+      @keyframes mslide{from{opacity:0;transform:translateY(32px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+      .mhero{position:relative;aspect-ratio:16/9;border-radius:20px 20px 0 0;overflow:hidden;background:var(--surface2)}
+      .mhero img{width:100%;height:100%;object-fit:cover;display:block}
+      .mhero-grad{position:absolute;inset:0;background:linear-gradient(to top,var(--surface) 0%,rgba(17,17,17,.05) 55%,transparent 100%)}
+      .mclose{position:absolute;top:12px;right:12px;z-index:10;width:32px;height:32px;background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);font-size:.85rem;transition:all .15s}
+      .mclose:hover{color:#fff;background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.25)}
+      .mbody{padding:4px 22px 26px}
+      .mtitle{font-family:"Bebas Neue",sans-serif;font-size:2rem;letter-spacing:2px;color:#fff;line-height:1;margin-bottom:10px}
+      .mtags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+      .mtag{padding:4px 10px;border-radius:5px;font-size:.68rem;font-weight:600}
+      .mtag-type{background:rgba(255,255,255,.1);color:#ddd}
+      .mtag-rating{background:rgba(245,197,24,.1);color:#f5c518;border:1px solid rgba(245,197,24,.15)}
+      .mtag-year{background:rgba(100,200,255,.1);color:#64c8ff;border:1px solid rgba(100,200,255,.15)}
+      .mtag-ai{background:var(--ai-bg);color:var(--ai);border:1px solid var(--ai-border)}
+      .moverview{font-size:.84rem;color:var(--text-dim);line-height:1.65;margin-bottom:20px;font-style:italic}
+      .mmeta{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+      .mmeta-item{display:flex;flex-direction:column;gap:2px}
+      .mmeta-key{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted)}
+      .mmeta-val{font-size:.8rem;font-weight:600;color:var(--text)}
+      .mmeta-val-list{font-size:.8rem;font-weight:500;color:var(--text);display:flex;flex-wrap:wrap;gap:4px}
+      .mmeta-badge{display:inline-block;background:rgba(255,255,255,.08);padding:2px 8px;border-radius:4px;border:1px solid rgba(255,255,255,.12)}
+      .msec{margin-bottom:16px}
+      .msec-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--text-muted);display:flex;align-items:center;gap:8px;margin-bottom:8px}
+      .msec-label::after{content:"";flex:1;height:1px;background:var(--border)}
+      .prow{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:9px;background:var(--surface2);border:1px solid var(--border);margin-bottom:6px;text-decoration:none;transition:all .15s ease;position:relative}
+      .prow:hover{border-color:var(--border-accent);background:rgba(255,255,255,.03);transform:translateX(3px)}
+      .prow:last-child{margin-bottom:0}
+      .prow.aff{border-color:rgba(245,197,24,.15);background:rgba(245,197,24,.08)}
+      .prow.aff:hover{border-color:rgba(245,197,24,.3);background:rgba(245,197,24,.06)}
+      .prow.aff .pwatch{color:#f5c518;opacity:.8}
+      .prow.aff:hover .pwatch{opacity:1;color:#f5c518}
+      .aff-badge{position:absolute;top:-1px;right:-1px;font-size:.48rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;background:rgba(245,197,24,.12);color:rgba(245,197,24,.6);border:1px solid rgba(245,197,24,.15);border-top-right-radius:9px;padding:2px 7px}
+      .pleft{display:flex;align-items:center;gap:10px}
+      .pimg{width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--surface3);border:1px solid var(--border)}
+      .pname{font-weight:600;font-size:.85rem;color:var(--text)}
+      .pwatch{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:4px;transition:gap .15s,color .15s;white-space:nowrap}
+      .prow:hover .pwatch{gap:7px;color:#fff}
+      .no-src{text-align:center;padding:24px;color:var(--text-muted);font-size:.85rem}
 
-      /* ─── GRID ─── */
-      .grid { display: grid; grid-template-columns: repeat(var(--grid-cols,2), 1fr); gap: 8px; }
-      @media (min-width: 480px) { :root { --grid-cols: 3; } }
-      @media (min-width: 720px) { :root { --grid-cols: 4; } }
-      @media (min-width: 980px) { :root { --grid-cols: 5; } }
-      @media (min-width: 1220px) { :root { --grid-cols: 6; } }
-      @media (min-width: 1440px) { :root { --grid-cols: 7; } }
+      /* ROULETTE */
+      .roulette-bg{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.9);backdrop-filter:blur(32px);display:flex;align-items:center;justify-content:center;animation:mfade .25s ease}
+      .roulette-card{display:flex;flex-direction:column;align-items:center;gap:20px;animation:roulettePop .4s cubic-bezier(.34,1.56,.64,1)}
+      @keyframes roulettePop{from{transform:scale(.7) rotate(-3deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
+      .roulette-poster{width:180px;height:270px;border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.8);border:1px solid rgba(255,255,255,.1)}
+      .roulette-poster img{width:100%;height:100%;object-fit:cover}
+      .roulette-title{font-family:"Bebas Neue",sans-serif;font-size:2.2rem;letter-spacing:4px;color:#fff;text-align:center;max-width:360px;line-height:1.1}
+      .roulette-meta{color:var(--text-dim);font-size:.8rem;text-align:center}
+      .roulette-actions{display:flex;gap:10px}
+      .rbtn{padding:10px 20px;border-radius:9px;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid}
+      .rbtn-open{background:#fff;color:#000;border-color:#fff}.rbtn-open:hover{background:rgba(255,255,255,.85)}
+      .rbtn-skip{background:transparent;color:var(--text-dim);border-color:var(--border)}.rbtn-skip:hover{background:var(--surface2);color:var(--text);border-color:var(--border-accent)}
+      .rbtn-close{background:transparent;color:var(--text-muted);border-color:transparent;font-size:.72rem}.rbtn-close:hover{color:var(--text-dim)}
 
-      /* ─── CARD ─── */
-      .card {
-        position: relative; border-radius: 10px; overflow: hidden;
-        cursor: pointer; aspect-ratio: 2/3; background: var(--surface2);
-        animation: cardIn 0.38s ease both; isolation: isolate;
-        transition: transform 0.28s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.28s;
-      }
-      @keyframes cardIn {
-        from { opacity: 0; transform: translateY(16px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      .card::after {
-        content: ""; position: absolute; inset: 0; border-radius: 10px;
-        border: 1px solid rgba(255,255,255,0); transition: border-color 0.25s;
-        pointer-events: none; z-index: 3;
-      }
-      .card:hover::after { border-color: rgba(255,255,255,0.22); }
-      .card:hover { box-shadow: 0 20px 60px rgba(0,0,0,0.7); transform: translateY(-4px) scale(1.035); }
-      .card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s ease; }
-      .card:hover .card-img { transform: scale(1.06); }
-      .card-img-placeholder {
-        width: 100%; height: 100%;
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        background: var(--surface3); gap: 8px; color: var(--text-muted);
-        font-size: 0.7rem; font-weight: 600; text-align: center; padding: 16px;
-      }
-      .card-img-placeholder svg { opacity: 0.3; }
-      .card-grad {
-        position: absolute; inset: 0; z-index: 1;
-        background: linear-gradient(to top, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.5) 38%, transparent 65%);
-        opacity: 0; transition: opacity 0.25s ease;
-      }
-      .card:hover .card-grad { opacity: 1; }
-      .card-info {
-        position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
-        padding: 12px 10px 10px; transform: translateY(6px);
-        opacity: 0; transition: all 0.25s ease;
-      }
-      .card:hover .card-info { opacity: 1; transform: translateY(0); }
-      .card-name {
-        font-size: 0.75rem; font-weight: 700; color: #fff;
-        line-height: 1.25; margin-bottom: 6px;
-        display: -webkit-box; -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical; overflow: hidden;
-      }
-      .card-badges { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
-      .cbadge { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; padding: 2px 6px; border-radius: 3px; }
-      .cbadge-type { background: rgba(255,255,255,0.15); color: #fff; }
-      .cbadge-rating { background: rgba(245,197,24,0.15); color: var(--gold); border: 1px solid rgba(245,197,24,0.2); }
-      .cbadge-year { background: rgba(100,200,255,0.12); color: #64c8ff; border: 1px solid rgba(100,200,255,0.2); }
-
-      /* AI score badge on card */
-      .card-ai-score {
-        position: absolute; top: 8px; left: 8px; z-index: 4;
-        font-size: 0.58rem; font-weight: 800;
-        background: linear-gradient(135deg, rgba(167,139,250,0.9), rgba(139,92,246,0.9));
-        color: #fff; padding: 2px 7px; border-radius: 99px;
-        letter-spacing: 0.4px;
-        backdrop-filter: blur(6px);
-        border: 1px solid rgba(167,139,250,0.4);
-        opacity: 0; transition: opacity 0.2s;
-      }
-      .card:hover .card-ai-score { opacity: 1; }
-
-      .card-play {
-        position: absolute; top: 50%; left: 50%; z-index: 2;
-        transform: translate(-50%,-50%) scale(0.6);
-        width: 44px; height: 44px; background: rgba(255,255,255,0.15);
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        opacity: 0; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
-        backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.25);
-      }
-      .card:hover .card-play { opacity: 1; transform: translate(-50%,-50%) scale(1); }
-      .card-src-count {
-        position: absolute; top: 8px; right: 8px; z-index: 2;
-        font-size: 0.6rem; font-weight: 700;
-        background: rgba(0,0,0,0.7); color: var(--text-dim);
-        border: 1px solid rgba(255,255,255,0.1); padding: 2px 7px;
-        border-radius: 99px; backdrop-filter: blur(6px);
-        opacity: 0; transition: opacity 0.2s;
-      }
-      .card:hover .card-src-count { opacity: 1; }
-
-      /* ─── SKELETON ─── */
-      .skel {
-        aspect-ratio: 2/3; border-radius: 10px;
-        background: linear-gradient(100deg, #0d0d0d 0%, #1c1c1c 50%, #0d0d0d 100%);
-        background-size: 300% 100%; animation: skel 1.8s ease infinite;
-      }
-      @keyframes skel {
-        0% { background-position: 100% 50%; }
-        100% { background-position: -100% 50%; }
-      }
-
-      /* ─── EMPTY / ERROR ─── */
-      .state-box {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        padding: 80px 20px; gap: 12px; color: var(--text-muted); text-align: center;
-      }
-      .state-icon { font-size: 3rem; }
-      .state-title { font-size: 1rem; font-weight: 600; color: var(--text-dim); }
-      .state-sub { font-size: 0.825rem; }
-
-      /* AI empty state */
-      .ai-empty-state {
-        display: flex; flex-direction: column; align-items: center;
-        padding: 60px 20px; gap: 16px; text-align: center;
-      }
-      .ai-empty-icon {
-        width: 64px; height: 64px; border-radius: 16px;
-        background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.15);
-        display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
-      }
-      .ai-empty-title { font-size: 1rem; font-weight: 600; color: var(--text-dim); }
-      .ai-empty-sub { font-size: 0.8rem; color: var(--text-muted); max-width: 320px; line-height: 1.6; }
-      .ai-suggestions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
-      .ai-suggestion-chip {
-        padding: 6px 14px; border-radius: 99px;
-        background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15);
-        color: var(--ai-color); font-size: 0.72rem; font-weight: 600;
-        cursor: pointer; transition: all 0.15s;
-      }
-      .ai-suggestion-chip:hover {
-        background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.3);
-      }
-
-      .err-box {
-        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09);
-        border-radius: 10px; padding: 16px 18px; color: #aaa;
-        font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 10px;
-      }
-      .load-row { display: flex; justify-content: center; padding: 24px 0; }
-      .spin {
-        width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.08);
-        border-top-color: rgba(255,255,255,0.4); border-radius: 50%;
-        animation: spin 0.65s linear infinite;
-      }
-      @keyframes spin { to { transform: rotate(360deg); } }
-      .end-line {
-        display: flex; align-items: center; gap: 14px; padding: 28px 0;
-        color: var(--text-muted); font-size: 0.78rem; font-weight: 500;
-      }
-      .end-line::before, .end-line::after {
-        content: ""; flex: 1; height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-      }
-
-      /* ─── MODAL ─── */
-      .mbg {
-        position: fixed; inset: 0; z-index: 200;
-        background: rgba(0,0,0,0.88);
-        backdrop-filter: blur(24px) saturate(140%);
-        -webkit-backdrop-filter: blur(24px) saturate(140%);
-        display: flex; align-items: center; justify-content: center;
-        padding: 16px; animation: mfade 0.2s ease;
-      }
-      @keyframes mfade { from { opacity: 0; } to { opacity: 1; } }
-      .mbox {
-        background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
-        border-radius: 20px; width: 100%; max-width: 660px; max-height: 90vh;
-        overflow-y: auto; position: relative;
-        animation: mslide 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
-        scrollbar-width: none; box-shadow: 0 40px 80px rgba(0,0,0,0.7);
-      }
-      .mbox::-webkit-scrollbar { display: none; }
-      @keyframes mslide {
-        from { opacity: 0; transform: translateY(32px) scale(0.96); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
-      }
-      .mhero {
-        position: relative; aspect-ratio: 16/9;
-        border-radius: 20px 20px 0 0; overflow: hidden; background: var(--surface2);
-      }
-      .mhero img { width: 100%; height: 100%; object-fit: cover; display: block; }
-      .mhero-grad {
-        position: absolute; inset: 0;
-        background: linear-gradient(to top, var(--surface) 0%, rgba(17,17,17,0.05) 55%, transparent 100%);
-      }
-      .mclose {
-        position: absolute; top: 12px; right: 12px; z-index: 10;
-        width: 32px; height: 32px; background: rgba(0,0,0,0.65);
-        border: 1px solid rgba(255,255,255,0.12); border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        cursor: pointer; color: var(--text-dim); font-size: 0.85rem; transition: all 0.15s;
-      }
-      .mclose:hover { color: #fff; background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.25); }
-      .mbody { padding: 4px 22px 26px; }
-      .mtitle { font-family: "Bebas Neue", sans-serif; font-size: 2rem; letter-spacing: 2px; color: #fff; line-height: 1; margin-bottom: 10px; }
-      .mtags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-      .mtag { padding: 4px 10px; border-radius: 5px; font-size: 0.68rem; font-weight: 600; }
-      .mtag-type { background: rgba(255,255,255,0.1); color: #ddd; }
-      .mtag-rating { background: rgba(245,197,24,0.1); color: var(--gold); border: 1px solid rgba(245,197,24,0.15); }
-      .mtag-year { background: rgba(100,200,255,0.1); color: #64c8ff; border: 1px solid rgba(100,200,255,0.15); }
-      .mtag-region { background: rgba(100,255,150,0.1); color: #64ff96; border: 1px solid rgba(100,255,150,0.15); font-size: 0.6rem; }
-      .mtag-ai { background: rgba(167,139,250,0.1); color: var(--ai-color); border: 1px solid rgba(167,139,250,0.15); }
-      .moverview { font-size: 0.84rem; font-weight: 400; color: var(--text-dim); line-height: 1.65; margin-bottom: 20px; font-style: italic; }
-      .mmeta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-      .mmeta-item { display: flex; flex-direction: column; gap: 2px; }
-      .mmeta-key { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
-      .mmeta-val { font-size: 0.8rem; font-weight: 600; color: var(--text); }
-      .mmeta-val-list { font-size: 0.8rem; font-weight: 500; color: var(--text); display: flex; flex-wrap: wrap; gap: 4px; }
-      .mmeta-badge { display: inline-block; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12); }
-      .msec { margin-bottom: 16px; }
-      .msec-label {
-        font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
-        letter-spacing: 2px; color: var(--text-muted);
-        display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
-      }
-      .msec-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-
-      /* ─── PROVIDER ROW ─── */
-      .prow {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 10px 12px; border-radius: 9px;
-        background: var(--surface2); border: 1px solid var(--border);
-        margin-bottom: 6px; text-decoration: none; transition: all 0.15s ease;
-        position: relative;
-      }
-      .prow:hover { border-color: var(--border-accent); background: rgba(255,255,255,0.03); transform: translateX(3px); }
-      .prow:last-child { margin-bottom: 0; }
-      .prow.is-affiliate {
-        border-color: rgba(245,197,24,0.15);
-        background: var(--affiliate-glow);
-      }
-      .prow.is-affiliate:hover {
-        border-color: rgba(245,197,24,0.3);
-        background: rgba(245,197,24,0.06);
-      }
-      .prow.is-affiliate .pwatch { color: var(--gold); opacity: 0.8; }
-      .prow.is-affiliate:hover .pwatch { opacity: 1; color: var(--gold); }
-      .affiliate-badge {
-        position: absolute; top: -1px; right: -1px;
-        font-size: 0.48rem; font-weight: 800;
-        text-transform: uppercase; letter-spacing: 1px;
-        background: rgba(245,197,24,0.12);
-        color: rgba(245,197,24,0.6);
-        border: 1px solid rgba(245,197,24,0.15);
-        border-top-right-radius: 9px;
-        padding: 2px 7px;
-      }
-      .pleft { display: flex; align-items: center; gap: 10px; }
-      .pimg {
-        width: 32px; height: 32px; border-radius: 6px; object-fit: cover;
-        flex-shrink: 0; background: var(--surface3); border: 1px solid var(--border);
-      }
-      .pname { font-weight: 600; font-size: 0.85rem; color: var(--text); }
-      .pwatch {
-        font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.5);
-        display: flex; align-items: center; gap: 4px;
-        transition: gap 0.15s, color 0.15s; white-space: nowrap;
-      }
-      .prow:hover .pwatch { gap: 7px; color: #fff; }
-      .no-src { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
-
-      /* ─── ROULETTE ─── */
-      .roulette-bg {
-        position: fixed; inset: 0; z-index: 250;
-        background: rgba(0,0,0,0.9); backdrop-filter: blur(32px);
-        display: flex; align-items: center; justify-content: center;
-        animation: mfade 0.25s ease;
-      }
-      .roulette-card {
-        display: flex; flex-direction: column; align-items: center; gap: 20px;
-        animation: roulettePop 0.4s cubic-bezier(0.34,1.56,0.64,1);
-      }
-      @keyframes roulettePop {
-        from { transform: scale(0.7) rotate(-3deg); opacity: 0; }
-        to { transform: scale(1) rotate(0deg); opacity: 1; }
-      }
-      .roulette-poster {
-        width: 180px; height: 270px; border-radius: 14px; overflow: hidden;
-        box-shadow: 0 30px 80px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1);
-      }
-      .roulette-poster img { width: 100%; height: 100%; object-fit: cover; }
-      .roulette-title { font-family: "Bebas Neue", sans-serif; font-size: 2.2rem; letter-spacing: 4px; color: #fff; text-align: center; max-width: 360px; line-height: 1.1; }
-      .roulette-meta { color: var(--text-dim); font-size: 0.8rem; text-align: center; }
-      .roulette-actions { display: flex; gap: 10px; }
-      .rbtn { padding: 10px 20px; border-radius: 9px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.15s; border: 1px solid; }
-      .rbtn-open { background: #fff; color: #000; border-color: #fff; }
-      .rbtn-open:hover { background: rgba(255,255,255,0.85); }
-      .rbtn-skip { background: transparent; color: var(--text-dim); border-color: var(--border); }
-      .rbtn-skip:hover { background: var(--surface2); color: var(--text); border-color: var(--border-accent); }
-      .rbtn-close { background: transparent; color: var(--text-muted); border-color: transparent; font-size: 0.72rem; }
-      .rbtn-close:hover { color: var(--text-dim); }
-
-      @media (max-width: 600px) {
-        .header-inner { padding: 11px 14px; }
-        #main { padding: 0 10px 80px; }
-        .search-wrap { flex: 1; }
-        .roulette-btn span { display: none; }
-      }
+      @media(max-width:600px){.header-inner{padding:11px 14px}#main{padding:0 10px 80px}.search-wrap{flex:1}.roulette-btn span:last-child{display:none}}
     </style>
   </head>
-
   <body>
     <div id="root"></div>
-
     <script type="text/babel">
       const { useEffect, useState, useRef, useCallback, useMemo } = React;
 
-      const API_BASE =
-        (window.ENV && window.ENV.API_URL)
-          ? window.ENV.API_URL
-          : 'https://freeflix-production.up.railway.app/';
-
-      const TMDB_IMG = (path, size = 'w500') =>
-        path ? `https://image.tmdb.org/t/p/${size}${path}` : null;
-
+      const API_BASE = (window.ENV?.API_URL) || 'https://freeflix-production.up.railway.app/';
+      const TMDB_IMG = (p, s='w500') => p ? `https://image.tmdb.org/t/p/${s}${p}` : null;
       const PER_PAGE = 20;
+      const MAX_HIST = 8;
 
-      const SECTION_DEFS = [
-        { key: 'flatrate', label: 'Included with Subscription' },
-        { key: 'rent',     label: 'Rent' },
-        { key: 'buy',      label: 'Buy' },
-        { key: 'free',     label: 'Free' },
-        { key: 'other',    label: 'Other' },
+      const SECTIONS = [
+        {key:'flatrate',label:'Included with Subscription'},
+        {key:'rent',label:'Rent'},{key:'buy',label:'Buy'},
+        {key:'free',label:'Free'},{key:'other',label:'Other'},
       ];
 
-      const AFFILIATE_LINKS = { amazon: 'https://amzn.to/46w62Rg' };
-
-      function getAffiliateLink(providerName) {
-        if (!providerName) return null;
-        const lower = providerName.toLowerCase();
-        for (const [key, link] of Object.entries(AFFILIATE_LINKS)) {
-          if (lower.includes(key)) return link;
-        }
-        return null;
-      }
-      function isAffiliateProvider(providerName) { return getAffiliateLink(providerName) !== null; }
-      function resolveProviderLink(src) {
-        const affiliateLink = getAffiliateLink(src.provider);
-        if (affiliateLink) return affiliateLink;
-        if (src.provider_url && src.provider_url !== '#') return src.provider_url;
-        if (src.link) return src.link;
-        return null;
-      }
-
+      const AFF_LINKS = { amazon:'https://amzn.to/46w62Rg' };
       const REGIONS = [
-        { code: 'all', label: 'All Regions' },
-        { code: 'US',  label: '🇺🇸 United States' },
-        { code: 'GB',  label: '🇬🇧 United Kingdom' },
-        { code: 'DE',  label: '🇩🇪 Germany' },
-        { code: 'FR',  label: '🇫🇷 France' },
-        { code: 'TR',  label: '🇹🇷 Turkey' },
-        { code: 'AU',  label: '🇦🇺 Australia' },
-        { code: 'CA',  label: '🇨🇦 Canada' },
-        { code: 'IN',  label: '🇮🇳 India' },
-        { code: 'JP',  label: '🇯🇵 Japan' },
+        {code:'all',label:'All Regions'},{code:'US',label:'🇺🇸 United States'},
+        {code:'GB',label:'🇬🇧 United Kingdom'},{code:'DE',label:'🇩🇪 Germany'},
+        {code:'FR',label:'🇫🇷 France'},{code:'TR',label:'🇹🇷 Turkey'},
+        {code:'AU',label:'🇦🇺 Australia'},{code:'CA',label:'🇨🇦 Canada'},
+        {code:'IN',label:'🇮🇳 India'},{code:'JP',label:'🇯🇵 Japan'},
+      ];
+      const AI_HINTS = [
+        'dark psychological thriller','feel-good romantic comedy',
+        'mind-bending sci-fi','Turkish drama series',
+        'action with comedy','Oscar winning movies',
+        'anime adventure','90s classic films',
       ];
 
-      // AI search placeholder suggestions
-      const AI_SUGGESTIONS = [
-        'dark psychological thriller',
-        'feel-good romantic comedy',
-        'mind-bending sci-fi',
-        'Turkish drama series',
-        'action with comedy',
-        'Oscar winning movies',
-        'anime adventure',
-        '90s classic films',
-      ];
+      // History
+      const HIST_KEY = 'ff_hist';
+      const loadHist = () => { try { return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch { return []; } };
+      const saveHist = a => { try { localStorage.setItem(HIST_KEY, JSON.stringify(a)); } catch {} };
+      const addHist = (q, arr) => {
+        const t = q.trim(); if (!t || t.length < 2) return arr;
+        const f = arr.filter(h => h.toLowerCase() !== t.toLowerCase());
+        const n = [t,...f].slice(0, MAX_HIST); saveHist(n); return n;
+      };
+      const rmHist = (q, arr) => { const n = arr.filter(h=>h!==q); saveHist(n); return n; };
 
-      function dedup(arr) {
-        const seen = new Set();
-        return arr.filter(item => {
-          const key = item.id ?? item.tmdb_id ?? `${item.name}||${item.type}`;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
+      const getAff = n => { if(!n) return null; const l=n.toLowerCase(); for(const[k,v] of Object.entries(AFF_LINKS)) if(l.includes(k)) return v; return null; };
+      const isAff = n => !!getAff(n);
+      const resLink = s => { const a=getAff(s.provider); if(a) return a; if(s.provider_url&&s.provider_url!=='#') return s.provider_url; if(s.link) return s.link; return null; };
+
+      const dedup = arr => { const seen=new Set(); return arr.filter(i=>{ const k=i.id??i.tmdb_id??`${i.name}||${i.type}`; if(seen.has(k)) return false; seen.add(k); return true; }); };
+
+      const norm = item => ({
+        id:item.id||item.tmdb_id, tmdb_id:item.tmdb_id, type:item.type, name:item.name,
+        overview:item.overview, image:item.image, backdrop:item.backdrop||item.backdrop_path,
+        year:item.year, genres:item.genres||[], runtime:item.runtime, seasons:item.seasons,
+        rating:item.rating, popularity:item.popularity, vote_count:item.vote_count,
+        original_language:item.original_language, source_info:item.source_info||[], regions:item.regions||[],
+      });
+
+      /* Animated hint */
+      function Hint({ hints, show }) {
+        const [idx, setIdx] = useState(0);
+        const [k, setK] = useState(0);
+        useEffect(() => {
+          const t = setInterval(() => { setIdx(i=>(i+1)%hints.length); setK(v=>v+1); }, 2800);
+          return () => clearInterval(t);
+        }, [hints.length]);
+        if (!show) return null;
+        return <span className="search-hint"><span className="hint-inner" key={k}>{hints[idx]}</span></span>;
       }
 
-      function normalizeContentItem(item) {
-        return {
-          id: item.id || item.tmdb_id,
-          tmdb_id: item.tmdb_id,
-          type: item.type,
-          name: item.name,
-          overview: item.overview,
-          image: item.image,
-          backdrop: item.backdrop || item.backdrop_path,
-          year: item.year,
-          genres: item.genres || [],
-          runtime: item.runtime,
-          seasons: item.seasons,
-          rating: item.rating,
-          popularity: item.popularity,
-          vote_count: item.vote_count,
-          original_language: item.original_language,
-          source_info: item.source_info || [],
-          regions: item.regions || [],
-        };
-      }
-
-      function PosterImg({ path, name, className, size = 'w500' }) {
-        const [failed, setFailed] = useState(false);
-        const src = TMDB_IMG(path, size);
-        if (!src || failed) {
-          return (
-            <div className="card-img-placeholder">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7l-4 5h8l-3-4-2 2.5z"/>
-              </svg>
-              <span>{(name||'').replace(/_/g,' ').slice(0,30)}</span>
-            </div>
-          );
-        }
-        return <img className={className} src={src} alt={name} onError={() => setFailed(true)} />;
-      }
-
-      function ProviderRow({ src }) {
-        const href = resolveProviderLink(src);
-        const isAffiliate = isAffiliateProvider(src.provider);
+      /* Search dropdown */
+      function Dropdown({ history, onSelect, onRemove, onClear, search }) {
+        const suggestions = AI_HINTS.filter(s => !search || s.toLowerCase().includes(search.toLowerCase())).slice(0,4);
+        if (!history.length && !suggestions.length) return null;
         return (
-          <a
-            href={href || '#'}
-            target={href ? '_blank' : '_self'}
-            rel="noopener noreferrer"
-            className={`prow${isAffiliate ? ' is-affiliate' : ''}`}
-            onClick={e => { if (!href) e.preventDefault(); }}
-          >
-            {isAffiliate && <span className="affiliate-badge">Ad</span>}
-            <div className="pleft">
-              {src.provider_image ? (
-                <img src={TMDB_IMG(src.provider_image, 'w92')} alt={src.provider} className="pimg" onError={e => { e.target.style.display='none'; }} />
-              ) : (
-                <div className="pimg" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.65rem',fontWeight:700,color:'var(--text-muted)'}}>
-                  {(src.provider||'?').slice(0,2).toUpperCase()}
+          <div className="search-dropdown">
+            {history.length > 0 && <>
+              <div className="dd-label">Recent searches</div>
+              {history.map(h => (
+                <div key={h} className="dd-item" onClick={() => onSelect(h)}>
+                  <div className="dd-ico hist">
+                    <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <span className="dd-text">{h}</span>
+                  <button className="dd-remove" onClick={e=>{e.stopPropagation();onRemove(h);}}>✕</button>
                 </div>
-              )}
+              ))}
+              {history.length > 1 && <button className="dd-clear" onClick={onClear}>Clear all history</button>}
+            </>}
+            {suggestions.length > 0 && <>
+              <div className="dd-label">Try searching</div>
+              {suggestions.map(s => (
+                <div key={s} className="dd-item" onClick={() => onSelect(s)}>
+                  <div className="dd-ico sugg">✦</div>
+                  <span className="dd-text">{s}</span>
+                </div>
+              ))}
+            </>}
+          </div>
+        );
+      }
+
+      /* Provider */
+      function Provider({ src }) {
+        const href = resLink(src); const aff = isAff(src.provider);
+        return (
+          <a href={href||'#'} target={href?'_blank':'_self'} rel="noopener noreferrer"
+            className={`prow${aff?' aff':''}`} onClick={e=>{if(!href)e.preventDefault();}}>
+            {aff && <span className="aff-badge">Ad</span>}
+            <div className="pleft">
+              {src.provider_image
+                ? <img src={TMDB_IMG(src.provider_image,'w92')} alt={src.provider} className="pimg" onError={e=>e.target.style.display='none'}/>
+                : <div className="pimg" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.65rem',fontWeight:700,color:'var(--text-muted)'}}>{(src.provider||'?').slice(0,2).toUpperCase()}</div>
+              }
               <span className="pname">{src.provider}</span>
             </div>
             <span className="pwatch">
-              {href ? 'Watch' : 'Unavailable'}
-              {href && (
-                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              )}
+              {href?'Watch':'Unavailable'}
+              {href && <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>}
             </span>
           </a>
         );
       }
 
-      function Modal({ item, onClose, profanityFilter, searchQuery }) {
+      /* Modal */
+      function Modal({ item, onClose, profanityFilter, isAiSearch }) {
         if (!item) return null;
         useEffect(() => {
-          const fn = e => { if (e.key === 'Escape') onClose(); };
+          const fn = e => { if(e.key==='Escape') onClose(); };
           document.addEventListener('keydown', fn);
           document.body.style.overflow = 'hidden';
-          return () => { document.removeEventListener('keydown', fn); document.body.style.overflow = ''; };
+          return () => { document.removeEventListener('keydown', fn); document.body.style.overflow=''; };
         }, []);
-
-        const grouped = useMemo(() =>
-          (item.source_info || []).reduce((acc, src) => {
-            const k = src.payment || 'other';
-            (acc[k] = acc[k] || []).push(src);
-            return acc;
-          }, {}), [item]);
-
-        const sections = SECTION_DEFS.filter(s => grouped[s.key]?.length > 0);
-        const srcCount = (item.source_info || []).length;
-        const displayName = (item.name || '').replace(/_/g, ' ');
-        const backdropPath = item.backdrop;
-        const heroSrc = backdropPath ? TMDB_IMG(backdropPath, 'w1280') : TMDB_IMG(item.image, 'w780');
-        const [heroFailed, setHeroFailed] = useState(false);
-        const hasAffiliateSource = (item.source_info || []).some(s => isAffiliateProvider(s.provider));
-
+        const grouped = useMemo(() => (item.source_info||[]).reduce((acc,s) => {
+          const k=s.payment||'other'; (acc[k]=acc[k]||[]).push(s); return acc;
+        }, {}), [item]);
+        const sections = SECTIONS.filter(s=>grouped[s.key]?.length>0);
+        const srcCount = (item.source_info||[]).length;
+        const name = (item.name||'').replace(/_/g,' ');
+        const hero = item.backdrop ? TMDB_IMG(item.backdrop,'w1280') : TMDB_IMG(item.image,'w780');
+        const [hf, setHf] = useState(false);
+        const hasAff2 = (item.source_info||[]).some(s=>isAff(s.provider));
         return (
           <div className="mbg" onClick={onClose}>
-            <div className="mbox" onClick={e => e.stopPropagation()}>
+            <div className="mbox" onClick={e=>e.stopPropagation()}>
               <div className="mhero">
-                {heroSrc && !heroFailed
-                  ? <img src={heroSrc} alt={displayName} onError={() => setHeroFailed(true)} />
-                  : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--surface2)'}}>
-                      <svg width="48" height="48" viewBox="0 0 24 24" fill="rgba(255,255,255,0.1)">
-                        <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/>
-                      </svg>
-                    </div>
-                }
-                <div className="mhero-grad" />
-                <button className="mclose" onClick={onClose} aria-label="Close">✕</button>
+                {hero&&!hf ? <img src={hero} alt={name} onError={()=>setHf(true)}/> :
+                  <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--surface2)'}}>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="rgba(255,255,255,.1)"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/></svg>
+                  </div>}
+                <div className="mhero-grad"/>
+                <button className="mclose" onClick={onClose}>✕</button>
               </div>
               <div className="mbody">
-                <h2 className="mtitle">{displayName}</h2>
+                <h2 className="mtitle">{name}</h2>
                 <div className="mtags">
-                  <span className="mtag mtag-type">{item.type === 'movie' ? '🎬 Movie' : '📺 Series'}</span>
+                  <span className="mtag mtag-type">{item.type==='movie'?'🎬 Movie':'📺 Series'}</span>
                   {item.rating && <span className="mtag mtag-rating">⭐ {parseFloat(item.rating).toFixed(1)}/5</span>}
                   {item.year && <span className="mtag mtag-year">📅 {item.year}</span>}
-                  {srcCount > 0 && <span className="mtag" style={{background:'rgba(255,255,255,0.04)',color:'var(--text-muted)',border:'1px solid rgba(255,255,255,0.06)'}}>{srcCount} source{srcCount !== 1 ? 's' : ''}</span>}
-                  {searchQuery && <span className="mtag mtag-ai">✦ AI Match</span>}
+                  {srcCount>0 && <span className="mtag" style={{background:'rgba(255,255,255,.04)',color:'var(--text-muted)',border:'1px solid rgba(255,255,255,.06)'}}>{srcCount} source{srcCount!==1?'s':''}</span>}
+                  {isAiSearch && <span className="mtag mtag-ai">✦ AI Match</span>}
                 </div>
-                {item.overview && (
-                  <p className="moverview">
-                    {profanityFilter ? item.overview.replace(/\b(fuck|shit|ass|bitch|damn|crap|bastard|hell)\b/gi, '***') : item.overview}
-                  </p>
-                )}
-                {(item.genres?.length > 0 || item.runtime || item.seasons || item.original_language) && (
+                {item.overview && <p className="moverview">{profanityFilter?item.overview.replace(/\b(fuck|shit|ass|bitch|damn|crap|bastard|hell)\b/gi,'***'):item.overview}</p>}
+                {(item.genres?.length>0||item.runtime||item.seasons||item.original_language) && (
                   <div className="mmeta">
-                    {item.genres?.length > 0 && (
-                      <div className="mmeta-item">
-                        <span className="mmeta-key">Genre</span>
-                        <span className="mmeta-val-list">{item.genres.slice(0,5).map((g,i) => <span key={i} className="mmeta-badge">{g}</span>)}</span>
-                      </div>
-                    )}
+                    {item.genres?.length>0 && <div className="mmeta-item"><span className="mmeta-key">Genre</span><span className="mmeta-val-list">{item.genres.slice(0,5).map((g,i)=><span key={i} className="mmeta-badge">{g}</span>)}</span></div>}
                     {item.runtime && <div className="mmeta-item"><span className="mmeta-key">Runtime</span><span className="mmeta-val">{item.runtime} min</span></div>}
                     {item.seasons && <div className="mmeta-item"><span className="mmeta-key">Seasons</span><span className="mmeta-val">{item.seasons}</span></div>}
                     {item.original_language && <div className="mmeta-item"><span className="mmeta-key">Language</span><span className="mmeta-val">{item.original_language.toUpperCase()}</span></div>}
                   </div>
                 )}
-                {sections.length > 0 ? sections.map(({ key, label }) => (
+                {sections.length>0 ? sections.map(({key,label})=>(
                   <div key={key} className="msec">
                     <div className="msec-label">{label}</div>
-                    {grouped[key].map((src, i) => <ProviderRow key={i} src={src} />)}
+                    {grouped[key].map((s,i)=><Provider key={i} src={s}/>)}
                   </div>
                 )) : <div className="no-src">No streaming sources found for this title</div>}
-                {hasAffiliateSource && (
-                  <div className="affiliate-info">
-                    <span>ℹ️</span>
-                    <span>Some links above are affiliate links. Clicking them may earn FreeFlix a small commission at no extra cost to you.</span>
-                  </div>
-                )}
+                {hasAff2 && <div className="affiliate-info"><span>ℹ️</span><span>Some links are affiliate links. Clicking them may earn FreeFlix a small commission at no extra cost to you.</span></div>}
               </div>
             </div>
           </div>
         );
       }
 
+      /* Card */
       function Card({ item, index, onClick, cardRef, isAiSearch }) {
-        const srcCount = (item.source_info || []).length;
+        const srcCount = (item.source_info||[]).length;
         const [imgFailed, setImgFailed] = useState(false);
-        const displayName = (item.name || '').replace(/_/g, ' ');
-        const imgSrc = TMDB_IMG(item.image);
+        const name = (item.name||'').replace(/_/g,' ');
+        const img = TMDB_IMG(item.image);
         return (
-          <div className="card" ref={cardRef} onClick={onClick} style={{ animationDelay: `${(index % PER_PAGE) * 0.028}s` }}>
-            {imgSrc && !imgFailed
-              ? <img className="card-img" src={imgSrc} alt={displayName} loading="lazy" onError={() => setImgFailed(true)} />
+          <div className="card" ref={cardRef} onClick={onClick} style={{animationDelay:`${(index%PER_PAGE)*0.028}s`}}>
+            {img&&!imgFailed
+              ? <img className="card-img" src={img} alt={name} loading="lazy" onError={()=>setImgFailed(true)}/>
               : <div className="card-img-placeholder">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{opacity:0.25}}>
-                    <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7l-4 5h8l-3-4-2 2.5z"/>
-                  </svg>
-                  <span style={{fontSize:'0.62rem',color:'var(--text-muted)',textAlign:'center',lineHeight:1.3,padding:'0 8px'}}>{displayName}</span>
-                </div>
-            }
-            <div className="card-grad" />
-            {srcCount > 0 && <div className="card-src-count">{srcCount} src</div>}
-            {isAiSearch && <div className="card-ai-score">✦ AI</div>}
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{opacity:.25}}><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7l-4 5h8l-3-4-2 2.5z"/></svg>
+                  <span style={{fontSize:'.62rem',color:'var(--text-muted)',textAlign:'center',lineHeight:1.3,padding:'0 8px'}}>{name}</span>
+                </div>}
+            <div className="card-grad"/>
+            {srcCount>0 && <div className="card-src">{srcCount} src</div>}
+            {isAiSearch && <div className="card-ai">✦ AI</div>}
             <div className="card-info">
-              <div className="card-name">{displayName}</div>
+              <div className="card-name">{name}</div>
               <div className="card-badges">
                 <span className="cbadge cbadge-type">{item.type}</span>
                 {item.year && <span className="cbadge cbadge-year">📅 {item.year}</span>}
                 {item.rating && <span className="cbadge cbadge-rating">⭐ {parseFloat(item.rating).toFixed(1)}</span>}
               </div>
             </div>
-            <div className="card-play">
-              <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-            </div>
+            <div className="card-play"><svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
           </div>
         );
       }
 
-      function Skeletons({ n = PER_PAGE }) {
-        return <div className="grid">{Array.from({ length: n }).map((_, i) => <div key={i} className="skel" />)}</div>;
+      function Skeletons({ n=PER_PAGE }) {
+        return <div className="grid">{Array.from({length:n}).map((_,i)=><div key={i} className="skel"/>)}</div>;
       }
 
-      function SettingsPanel({ settings, onChange, onClose }) {
+      function Settings({ settings, onChange, onClose }) {
         return (
           <>
-            <div className="settings-overlay" onClick={onClose} />
+            <div className="settings-overlay" onClick={onClose}/>
             <div className="settings-panel">
-              <div className="settings-title">Settings<button className="settings-close" onClick={onClose}>✕</button></div>
+              <div className="settings-title">Settings <button className="settings-close" onClick={onClose}>✕</button></div>
               <div className="settings-section">
                 <div className="settings-section-title">Display</div>
                 <div className="settings-row">
                   <div>
                     <div className="settings-row-label">Grid Size</div>
                     <div className="settings-row-sub">Columns per row</div>
-                    <input type="range" min="3" max="9" value={settings.gridCols} onChange={e => onChange('gridCols', Number(e.target.value))} className="grid-slider" />
-                    <div style={{fontSize:'0.68rem',color:'var(--text-muted)',marginTop:4}}>{settings.gridCols} columns</div>
+                    <input type="range" min="3" max="9" value={settings.gridCols} onChange={e=>onChange('gridCols',Number(e.target.value))} className="grid-slider"/>
+                    <div style={{fontSize:'.68rem',color:'var(--text-muted)',marginTop:4}}>{settings.gridCols} columns</div>
                   </div>
                 </div>
               </div>
               <div className="settings-section">
                 <div className="settings-section-title">Content</div>
                 <div className="settings-row">
-                  <div>
-                    <div className="settings-row-label">Profanity Filter</div>
-                    <div className="settings-row-sub">Censor strong language in descriptions</div>
-                  </div>
-                  <div className={`toggle ${settings.profanityFilter ? 'on' : ''}`} onClick={() => onChange('profanityFilter', !settings.profanityFilter)} />
+                  <div><div className="settings-row-label">Profanity Filter</div><div className="settings-row-sub">Censor strong language</div></div>
+                  <div className={`toggle ${settings.profanityFilter?'on':''}`} onClick={()=>onChange('profanityFilter',!settings.profanityFilter)}/>
                 </div>
               </div>
               <div className="settings-section">
                 <div className="settings-section-title">Region</div>
-                <div style={{fontSize:'0.78rem',color:'var(--text-muted)',lineHeight:1.5,marginBottom:4}}>Filter availability by your region.</div>
-                <select className="region-select" value={settings.region} onChange={e => onChange('region', e.target.value)}>
-                  {REGIONS.map(r => <option key={r.code} value={r.code}>{r.label}</option>)}
+                <select className="region-select" value={settings.region} onChange={e=>onChange('region',e.target.value)}>
+                  {REGIONS.map(r=><option key={r.code} value={r.code}>{r.label}</option>)}
                 </select>
               </div>
               <div className="settings-section">
                 <div className="settings-section-title">About</div>
-                <div className="affiliate-info" style={{marginTop:0}}>
-                  <span>ℹ️</span>
-                  <span>FreeFlix uses affiliate links for some streaming providers. These help keep the service free.</span>
-                </div>
+                <div className="affiliate-info" style={{marginTop:0}}><span>ℹ️</span><span>FreeFlix uses affiliate links for some streaming providers. These help keep the service free.</span></div>
               </div>
             </div>
           </>
         );
       }
 
-      function RouletteOverlay({ items, onOpen, onClose }) {
-        const [pick, setPick] = useState(() => {
-          const pool = items.filter(i => i.image);
-          return pool[Math.floor(Math.random() * pool.length)];
-        });
-        const spin = () => {
-          const pool = items.filter(i => i.image);
-          setPick(pool[Math.floor(Math.random() * pool.length)]);
-        };
-        if (!pick) return (
-          <div className="roulette-bg" onClick={onClose}>
-            <div style={{color:'var(--text-dim)',textAlign:'center'}}>
-              <div style={{fontSize:'2rem',marginBottom:12}}>🎲</div>
-              <div>Not enough titles loaded yet</div>
-            </div>
-          </div>
-        );
-        const imgSrc = TMDB_IMG(pick.image, 'w342');
-        const displayName = (pick.name || '').replace(/_/g,' ');
+      function Roulette({ items, onOpen, onClose }) {
+        const pool = items.filter(i=>i.image);
+        const [pick, setPick] = useState(() => pool[Math.floor(Math.random()*pool.length)]);
+        const spin = () => setPick(pool[Math.floor(Math.random()*pool.length)]);
+        if (!pick) return <div className="roulette-bg" onClick={onClose}><div style={{color:'var(--text-dim)',textAlign:'center'}}><div style={{fontSize:'2rem',marginBottom:12}}>🎲</div><div>Not enough titles loaded yet</div></div></div>;
+        const img = TMDB_IMG(pick.image,'w342');
+        const name = (pick.name||'').replace(/_/g,' ');
         return (
           <div className="roulette-bg" onClick={onClose}>
-            <div className="roulette-card" onClick={e => e.stopPropagation()}>
-              <div style={{fontSize:'0.7rem',letterSpacing:'3px',textTransform:'uppercase',color:'var(--text-muted)'}}>🎲 Random Pick</div>
-              <div className="roulette-poster">
-                {imgSrc ? <img src={imgSrc} alt={displayName} style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <div style={{width:'100%',height:'100%',background:'var(--surface3)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text-muted)',fontSize:'0.8rem',textAlign:'center',padding:16}}>{displayName}</div>}
-              </div>
-              <div className="roulette-title">{displayName}</div>
-              <div className="roulette-meta">
-                {pick.type === 'movie' ? '🎬 Movie' : '📺 Series'}
-                {pick.year ? ` · 📅 ${pick.year}` : ''}
-                {pick.rating ? ` · ⭐ ${parseFloat(pick.rating).toFixed(1)}` : ''}
-              </div>
+            <div className="roulette-card" onClick={e=>e.stopPropagation()}>
+              <div style={{fontSize:'.7rem',letterSpacing:'3px',textTransform:'uppercase',color:'var(--text-muted)'}}>🎲 Random Pick</div>
+              <div className="roulette-poster">{img?<img src={img} alt={name} style={{width:'100%',height:'100%',objectFit:'cover'}}/>:<div style={{width:'100%',height:'100%',background:'var(--surface3)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text-muted)',fontSize:'.8rem',textAlign:'center',padding:16}}>{name}</div>}</div>
+              <div className="roulette-title">{name}</div>
+              <div className="roulette-meta">{pick.type==='movie'?'🎬 Movie':'📺 Series'}{pick.year?` · 📅 ${pick.year}`:''}{pick.rating?` · ⭐ ${parseFloat(pick.rating).toFixed(1)}`:''}</div>
               <div className="roulette-actions">
-                <button className="rbtn rbtn-open" onClick={() => { onOpen(pick); onClose(); }}>Open Title</button>
+                <button className="rbtn rbtn-open" onClick={()=>{onOpen(pick);onClose();}}>Open Title</button>
                 <button className="rbtn rbtn-skip" onClick={spin}>Try Another 🎲</button>
               </div>
               <button className="rbtn rbtn-close" onClick={onClose}>Close</button>
@@ -996,212 +512,164 @@
         );
       }
 
-      /* Animated placeholder component */
-      function AnimatedPlaceholder({ hints, visible }) {
-        const [idx, setIdx] = useState(0);
-        useEffect(() => {
-          const t = setInterval(() => setIdx(i => (i + 1) % hints.length), 3000);
-          return () => clearInterval(t);
-        }, [hints.length]);
-        if (!visible) return null;
-        return (
-          <span className="search-placeholder-hint">
-            <span key={idx} className="hint-text">{hints[idx]}</span>
-          </span>
-        );
-      }
-
       /* ─── APP ─── */
       function FreeFlix() {
-        const [items, setItems]             = useState([]);
-        const [selected, setSelected]       = useState(null);
-        const [loading, setLoading]         = useState(true);
+        const [items, setItems]         = useState([]);
+        const [selected, setSelected]   = useState(null);
+        const [loading, setLoading]     = useState(true);
         const [loadingMore, setLoadingMore] = useState(false);
-        const [error, setError]             = useState(null);
-        const [page, setPage]               = useState(1);
-        const [hasMore, setHasMore]         = useState(true);
-        const [sources, setSources]         = useState([]);
-        const [search, setSearch]           = useState('');
-        const [debSearch, setDebSearch]     = useState('');
-        const [typeFilter, setTypeFilter]   = useState('all');
-        const [srcFilter, setSrcFilter]     = useState('all');
-        const [sortBy, setSortBy]           = useState('popularity');
+        const [error, setError]         = useState(null);
+        const [page, setPage]           = useState(1);
+        const [hasMore, setHasMore]     = useState(true);
+        const [sources, setSources]     = useState([]);
+        const [search, setSearch]       = useState('');
+        const [debSearch, setDebSearch] = useState('');
+        const [typeFilter, setTypeFilter] = useState('all');
+        const [srcFilter, setSrcFilter]   = useState('all');
+        const [sortBy, setSortBy]         = useState('popularity');
         const [showSettings, setShowSettings] = useState(false);
         const [showRoulette, setShowRoulette] = useState(false);
-        const [searchFocused, setSearchFocused] = useState(false);
-        const [settings, setSettings] = useState({ profanityFilter: false, gridCols: null, region: 'all' });
+        const [focused, setFocused]     = useState(false);
+        const [scrolled, setScrolled]   = useState(false);
+        const [history, setHistory]     = useState(loadHist);
+        const [settings, setSettings]   = useState({ profanityFilter:false, gridCols:null, region:'all' });
 
-        const updateSetting = (key, val) => setSettings(prev => ({ ...prev, [key]: val }));
+        const updSetting = (k,v) => setSettings(p=>({...p,[k]:v}));
 
         useEffect(() => {
-          if (settings.gridCols) {
-            document.documentElement.style.setProperty('--grid-cols', settings.gridCols);
-          } else {
-            document.documentElement.style.removeProperty('--grid-cols');
-          }
+          if (settings.gridCols) document.documentElement.style.setProperty('--grid-cols', settings.gridCols);
+          else document.documentElement.style.removeProperty('--grid-cols');
         }, [settings.gridCols]);
+
+        useEffect(() => {
+          const fn = () => setScrolled(window.scrollY > 10);
+          window.addEventListener('scroll', fn, {passive:true});
+          return () => window.removeEventListener('scroll', fn);
+        }, []);
 
         const headerRef = useRef();
         const [headerH, setHeaderH] = useState(120);
         useEffect(() => {
           if (!headerRef.current) return;
           const ro = new ResizeObserver(() => setHeaderH(headerRef.current.offsetHeight));
-          ro.observe(headerRef.current);
-          return () => ro.disconnect();
+          ro.observe(headerRef.current); return () => ro.disconnect();
         }, []);
 
         const observerRef = useRef();
         const lastCardRef = useRef();
 
         useEffect(() => {
-          const t = setTimeout(() => setDebSearch(search), 420);
+          const t = setTimeout(() => {
+            setDebSearch(search);
+            if (search.trim().length >= 2) setHistory(h => addHist(search, h));
+          }, 500);
           return () => clearTimeout(t);
         }, [search]);
 
-        const fetchItems = useCallback((pageNum, append, q) => {
+        const fetchItems = useCallback((pg, append, q) => {
           append ? setLoadingMore(true) : setLoading(true);
           setError(null);
-          const p = new URLSearchParams({ page: pageNum, limit: PER_PAGE });
+          const p = new URLSearchParams({page:pg, limit:PER_PAGE});
           if (q) p.set('search', q);
           fetch(`${API_BASE}?${p}`)
-            .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
-            .then(data => {
-              const raw = Array.isArray(data) ? data : Array.isArray(data.content) ? data.content : [];
-              const normalized = raw.map(normalizeContentItem);
-              const fresh = dedup(normalized);
-              setItems(prev => {
-                const next = append ? dedup([...prev, ...fresh]) : fresh;
-                return next;
-              });
-              if (!append) {
-                const seen = new Set();
-                fresh.forEach(it => (it.source_info || []).forEach(s => seen.add(s.provider)));
-                setSources([...seen].filter(Boolean).sort());
-              }
+            .then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); })
+            .then(data=>{
+              const raw = Array.isArray(data)?data:Array.isArray(data.content)?data.content:[];
+              const fresh = dedup(raw.map(norm));
+              setItems(prev => append ? dedup([...prev,...fresh]) : fresh);
+              if (!append) { const seen=new Set(); fresh.forEach(it=>(it.source_info||[]).forEach(s=>seen.add(s.provider))); setSources([...seen].filter(Boolean).sort()); }
               setHasMore(fresh.length === PER_PAGE);
             })
-            .catch(err => { console.error(err); setError('Could not reach the server — please try again.'); })
-            .finally(() => { setLoading(false); setLoadingMore(false); });
+            .catch(err=>{ console.error(err); setError('Could not reach the server — please try again.'); })
+            .finally(()=>{ setLoading(false); setLoadingMore(false); });
         }, []);
 
-        useEffect(() => {
-          setPage(1); setItems([]); setHasMore(true);
-          fetchItems(1, false, debSearch);
-        }, [debSearch, fetchItems]);
+        useEffect(() => { setPage(1); setItems([]); setHasMore(true); fetchItems(1,false,debSearch); }, [debSearch, fetchItems]);
 
         const loadMore = useCallback(() => {
-          if (loadingMore || !hasMore || loading) return;
-          const next = page + 1;
-          setPage(next);
-          fetchItems(next, true, debSearch);
-        }, [page, hasMore, loadingMore, loading, fetchItems, debSearch]);
+          if (loadingMore||!hasMore||loading) return;
+          const next=page+1; setPage(next); fetchItems(next,true,debSearch);
+        }, [page,hasMore,loadingMore,loading,fetchItems,debSearch]);
 
         useEffect(() => {
-          observerRef.current = new IntersectionObserver(
-            entries => { if (entries[0].isIntersecting) loadMore(); },
-            { rootMargin: '400px' }
-          );
+          observerRef.current = new IntersectionObserver(entries=>{if(entries[0].isIntersecting) loadMore();}, {rootMargin:'400px'});
           if (lastCardRef.current) observerRef.current.observe(lastCardRef.current);
           return () => observerRef.current?.disconnect();
         }, [loadMore]);
 
         const filtered = useMemo(() => {
-          let arr = items.filter(item => {
-            if (typeFilter !== 'all' && item.type !== typeFilter) return false;
-            if (srcFilter !== 'all') {
-              const ps = (item.source_info || []).map(s => s.provider);
-              if (!ps.includes(srcFilter)) return false;
-            }
-            if (settings.region !== 'all' && item.regions) {
-              if (!item.regions.includes(settings.region)) return false;
-            }
+          let arr = items.filter(item=>{
+            if (typeFilter!=='all'&&item.type!==typeFilter) return false;
+            if (srcFilter!=='all') { const ps=(item.source_info||[]).map(s=>s.provider); if(!ps.includes(srcFilter)) return false; }
+            if (settings.region!=='all'&&item.regions) { if(!item.regions.includes(settings.region)) return false; }
             return true;
           });
-          if (sortBy === 'popularity') arr = [...arr].sort((a, b) => (b.popularity ?? b.vote_count ?? 0) - (a.popularity ?? a.vote_count ?? 0));
-          else if (sortBy === 'rating') arr = [...arr].sort((a, b) => (parseFloat(b.rating) ?? 0) - (parseFloat(a.rating) ?? 0));
-          else if (sortBy === 'year') arr = [...arr].sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
-          else if (sortBy === 'az') arr = [...arr].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+          if (sortBy==='popularity') arr=[...arr].sort((a,b)=>(b.popularity??b.vote_count??0)-(a.popularity??a.vote_count??0));
+          else if (sortBy==='rating') arr=[...arr].sort((a,b)=>(parseFloat(b.rating)??0)-(parseFloat(a.rating)??0));
+          else if (sortBy==='year') arr=[...arr].sort((a,b)=>(b.year??0)-(a.year??0));
+          else if (sortBy==='az') arr=[...arr].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
           return arr;
-        }, [items, typeFilter, srcFilter, sortBy, settings.region]);
+        }, [items,typeFilter,srcFilter,sortBy,settings.region]);
 
-        const showEmpty = !loading && !loadingMore && !error && filtered.length === 0;
-        const isSearching = debSearch.trim().length > 0;
-        const showPlaceholder = !search && !searchFocused;
+        const showEmpty = !loading&&!loadingMore&&!error&&filtered.length===0;
+        const isSearching = debSearch.trim().length>0;
+        const showHint = !search && !focused;
+        const showDrop = focused && (history.length>0 || AI_HINTS.length>0);
 
-        const resetToHome = () => {
-          setSearch(''); setDebSearch('');
-          setTypeFilter('all'); setSrcFilter('all'); setSortBy('popularity');
-        };
-
-        const handleSuggestionClick = (suggestion) => {
-          setSearch(suggestion);
-        };
+        const resetHome = () => { setSearch('');setDebSearch('');setTypeFilter('all');setSrcFilter('all');setSortBy('popularity'); };
+        const selectSugg = s => { setSearch(s); setHistory(h=>addHist(s,h)); };
+        const removeHist = s => setHistory(h=>rmHist(s,h));
+        const clearHist = () => { setHistory([]); saveHist([]); };
 
         return (
           <>
-            <header id="header" ref={headerRef}>
+            <header id="header" ref={headerRef} className={scrolled?'scrolled':''}>
               <div className="header-inner">
                 <div className="header-top">
-                  <div className="logo" onClick={resetToHome} title="Back to home">
-                    <span className="logo-dim">FREE</span>
-                    <span className="logo-white">FLIX</span>
-                  </div>
+                  <div className="logo" onClick={resetHome}><span className="logo-dim">FREE</span><span className="logo-white">FLIX</span></div>
 
                   <div className="search-wrap">
                     <svg className="search-icon-left" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                     <input
-                      className={`search-input${isSearching ? ' ai-active' : ''}`}
-                      type="text"
-                      value={search}
-                      onChange={e => setSearch(e.target.value)}
-                      onFocus={() => setSearchFocused(true)}
-                      onBlur={() => setSearchFocused(false)}
-                      autoComplete="off"
-                      spellCheck="false"
+                      className={`search-input${isSearching?' active':''}`}
+                      type="text" value={search}
+                      onChange={e=>setSearch(e.target.value)}
+                      onFocus={()=>setFocused(true)}
+                      onBlur={()=>setTimeout(()=>setFocused(false),160)}
+                      autoComplete="off" spellCheck="false"
                     />
-                    <AnimatedPlaceholder hints={AI_SUGGESTIONS} visible={showPlaceholder} />
-                    <span className="ai-badge">
-                      <span className="ai-dot" />
-                      AI Search
-                    </span>
+                    <Hint hints={AI_HINTS} show={showHint}/>
+                    <span className="ai-badge"><span className="ai-dot"/>AI Search</span>
+                    {showDrop && <Dropdown history={history} search={search} onSelect={selectSugg} onRemove={removeHist} onClear={clearHist}/>}
                   </div>
 
-                  {isSearching && !loading && (
-                    <span className="search-count">{filtered.length} result{filtered.length !== 1 ? 's' : ''}</span>
-                  )}
+                  {isSearching && !loading && <span className="search-count">{filtered.length} result{filtered.length!==1?'s':''}</span>}
 
                   <div className="header-actions">
-                    <button className="roulette-btn" onClick={() => setShowRoulette(true)} title="Random pick">
-                      <span>🎲</span>
-                      <span>Surprise Me</span>
-                    </button>
-                    <button className={`icon-btn ${showSettings ? 'active' : ''}`} onClick={() => setShowSettings(v => !v)} title="Settings">
+                    <button className="roulette-btn" onClick={()=>setShowRoulette(true)}><span>🎲</span><span>Surprise Me</span></button>
+                    <button className={`icon-btn ${showSettings?'active':''}`} onClick={()=>setShowSettings(v=>!v)}>
                       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                       </svg>
                     </button>
                   </div>
                 </div>
 
                 <div className="filter-bar">
-                  {[{v:'all',l:'All'},{v:'movie',l:'🎬 Movies'},{v:'series',l:'📺 Series'}].map(({ v, l }) => (
-                    <button key={v} className={`fbtn ${typeFilter === v ? 'on' : ''}`} onClick={() => setTypeFilter(v)}>{l}</button>
+                  {[{v:'all',l:'All'},{v:'movie',l:'🎬 Movies'},{v:'series',l:'📺 Series'}].map(({v,l})=>(
+                    <button key={v} className={`fbtn ${typeFilter===v?'on':''}`} onClick={()=>setTypeFilter(v)}>{l}</button>
                   ))}
-                  {sources.length > 0 && (
-                    <>
-                      <div className="fsep" />
-                      <button className={`fbtn ${srcFilter === 'all' ? 'on' : ''}`} onClick={() => setSrcFilter('all')}>All Sources</button>
-                      {sources.map(s => (
-                        <button key={s} className={`fbtn ${srcFilter === s ? 'on' : ''}`} onClick={() => setSrcFilter(s)}>{s}</button>
-                      ))}
-                    </>
-                  )}
+                  {sources.length>0 && <>
+                    <div className="fsep"/>
+                    <button className={`fbtn ${srcFilter==='all'?'on':''}`} onClick={()=>setSrcFilter('all')}>All Sources</button>
+                    {sources.map(s=><button key={s} className={`fbtn ${srcFilter===s?'on':''}`} onClick={()=>setSrcFilter(s)}>{s}</button>)}
+                  </>}
                   <div className="sort-label" style={{marginLeft:'auto'}}>
                     Sort
-                    <select className="sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                    <select className="sort-select" value={sortBy} onChange={e=>setSortBy(e.target.value)}>
                       <option value="popularity">Popularity</option>
                       <option value="rating">Rating</option>
                       <option value="year">Year</option>
@@ -1212,64 +680,42 @@
               </div>
             </header>
 
-            <main id="main" style={{ paddingTop: headerH + 16 }}>
-
-              {/* AI Result Banner */}
-              {isSearching && !loading && filtered.length > 0 && (
-                <div className="ai-result-banner">
-                  <div className="ai-result-icon">✦</div>
-                  <div className="ai-result-text">
-                    <div className="ai-result-title">AI Semantic Search</div>
-                    <div className="ai-result-sub">Results matched by meaning, not just keywords — "{debSearch}"</div>
+            <main id="main" style={{paddingTop:headerH+16}}>
+              {isSearching&&!loading&&filtered.length>0 && (
+                <div className="ai-banner">
+                  <div className="ai-banner-icon">✦</div>
+                  <div className="ai-banner-text">
+                    <div className="ai-banner-title">AI Semantic Search</div>
+                    <div className="ai-banner-sub">Results matched by meaning — "{debSearch}"</div>
                   </div>
-                  <div className="ai-result-count">{filtered.length}</div>
+                  <div className="ai-banner-count">{filtered.length}</div>
                 </div>
               )}
 
-              {loading && <Skeletons n={PER_PAGE} />}
+              {loading && <Skeletons n={PER_PAGE}/>}
+              {error && <div className="err-box"><svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>{error}</div>}
 
-              {error && (
-                <div className="err-box">
-                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
-                  </svg>
-                  {error}
-                </div>
-              )}
-
-              {!loading && !error && filtered.length > 0 && (
+              {!loading&&!error&&filtered.length>0 && (
                 <div className="grid">
-                  {filtered.map((item, i) => {
-                    const key = item.id ?? item.tmdb_id ?? `${item.name}||${item.type}`;
-                    return (
-                      <Card
-                        key={key}
-                        item={item}
-                        index={i}
-                        onClick={() => setSelected(item)}
-                        cardRef={i === filtered.length - 1 ? lastCardRef : null}
-                        isAiSearch={isSearching}
-                      />
-                    );
+                  {filtered.map((item,i)=>{
+                    const key=item.id??item.tmdb_id??`${item.name}||${item.type}`;
+                    return <Card key={key} item={item} index={i} onClick={()=>setSelected(item)} cardRef={i===filtered.length-1?lastCardRef:null} isAiSearch={isSearching}/>;
                   })}
                 </div>
               )}
 
-              {/* AI Empty State with suggestions */}
-              {showEmpty && isSearching && (
-                <div className="ai-empty-state">
+              {showEmpty&&isSearching && (
+                <div className="ai-empty">
                   <div className="ai-empty-icon">🔍</div>
-                  <div className="ai-empty-title">No matches found for "{debSearch}"</div>
-                  <div className="ai-empty-sub">Try rephrasing your search. Our AI search works best with descriptive phrases.</div>
-                  <div className="ai-suggestions">
-                    {AI_SUGGESTIONS.slice(0, 5).map(s => (
-                      <button key={s} className="ai-suggestion-chip" onClick={() => handleSuggestionClick(s)}>{s}</button>
-                    ))}
+                  <div className="ai-empty-title">No matches for "{debSearch}"</div>
+                  <div className="ai-empty-sub">Try rephrasing — AI search works best with descriptive phrases.</div>
+                  <div className="ai-chips">
+                    {AI_HINTS.slice(0,5).map(s=><button key={s} className="ai-chip" onClick={()=>selectSugg(s)}>{s}</button>)}
                   </div>
                 </div>
               )}
 
-              {showEmpty && !isSearching && (
+              {showEmpty&&!isSearching && (
                 <div className="state-box">
                   <div className="state-icon">🎬</div>
                   <div className="state-title">No results found</div>
@@ -1277,33 +723,13 @@
                 </div>
               )}
 
-              {loadingMore && <div className="load-row"><div className="spin" /></div>}
-
-              {!loading && !loadingMore && !hasMore && filtered.length > 0 && (
-                <div className="end-line">You've seen it all 🎬</div>
-              )}
+              {loadingMore && <div className="load-row"><div className="spin"/></div>}
+              {!loading&&!loadingMore&&!hasMore&&filtered.length>0 && <div className="end-line">You've seen it all 🎬</div>}
             </main>
 
-            {selected && (
-              <Modal
-                item={selected}
-                onClose={() => setSelected(null)}
-                profanityFilter={settings.profanityFilter}
-                searchQuery={isSearching ? debSearch : null}
-              />
-            )}
-
-            {showSettings && (
-              <SettingsPanel settings={settings} onChange={updateSetting} onClose={() => setShowSettings(false)} />
-            )}
-
-            {showRoulette && items.length > 0 && (
-              <RouletteOverlay
-                items={filtered.length > 0 ? filtered : items}
-                onOpen={setSelected}
-                onClose={() => setShowRoulette(false)}
-              />
-            )}
+            {selected && <Modal item={selected} onClose={()=>setSelected(null)} profanityFilter={settings.profanityFilter} isAiSearch={isSearching}/>}
+            {showSettings && <Settings settings={settings} onChange={updSetting} onClose={()=>setShowSettings(false)}/>}
+            {showRoulette&&items.length>0 && <Roulette items={filtered.length>0?filtered:items} onOpen={setSelected} onClose={()=>setShowRoulette(false)}/>}
           </>
         );
       }
