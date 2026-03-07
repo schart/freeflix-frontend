@@ -7,10 +7,9 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap");
-
       :root {
         --accent: #c8c8c8;
         --accent-glow: rgba(200, 200, 200, 0.12);
@@ -26,6 +25,8 @@
         --gold: #f5c518;
         --affiliate-glow: rgba(245, 197, 24, 0.08);
         --grid-cols: 6;
+        --ai-color: #a78bfa;
+        --ai-glow: rgba(167, 139, 250, 0.15);
       }
 
       *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -74,26 +75,93 @@
       .logo-dim { color: rgba(255,255,255,0.35); }
       .logo-white { color: #fff; }
 
-      .search-wrap { position: relative; flex: 0 1 340px; margin-left: auto; }
+      /* ─── AI SEARCH BOX ─── */
+      .search-wrap {
+        position: relative; flex: 0 1 420px; margin-left: auto;
+      }
       .search-input {
         width: 100%;
-        background: var(--surface2); border: 1px solid var(--border);
-        border-radius: 8px; padding: 8px 36px 8px 12px;
-        color: var(--text); font-family: "DM Sans", sans-serif;
-        font-size: 0.83rem; outline: none;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 9px 80px 9px 38px;
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.83rem;
+        outline: none;
         transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       }
       .search-input::placeholder { color: var(--text-muted); }
       .search-input:focus {
-        border-color: var(--border-accent);
-        box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
+        border-color: rgba(167,139,250,0.4);
+        box-shadow: 0 0 0 3px rgba(167,139,250,0.08);
         background: var(--surface3);
       }
-      .search-icon {
-        position: absolute; right: 10px; top: 50%;
-        transform: translateY(-50%); color: rgba(255,255,255,0.22);
-        pointer-events: none;
+      .search-input.ai-active {
+        border-color: rgba(167,139,250,0.4);
+        box-shadow: 0 0 0 3px rgba(167,139,250,0.08);
       }
+      .search-icon-left {
+        position: absolute; left: 11px; top: 50%;
+        transform: translateY(-50%); color: rgba(255,255,255,0.22);
+        pointer-events: none; transition: color 0.2s;
+      }
+      .search-input:focus ~ .search-icon-left,
+      .search-wrap:focus-within .search-icon-left { color: var(--ai-color); }
+
+      .ai-badge {
+        position: absolute; right: 8px; top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(167,139,250,0.08));
+        border: 1px solid rgba(167,139,250,0.25);
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 0.58rem;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        color: var(--ai-color);
+        text-transform: uppercase;
+        white-space: nowrap;
+        pointer-events: none;
+        display: flex; align-items: center; gap: 4px;
+      }
+      .ai-dot {
+        width: 5px; height: 5px; border-radius: 50%;
+        background: var(--ai-color);
+        animation: aiPulse 2s ease infinite;
+      }
+      @keyframes aiPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.7); }
+      }
+
+      /* Animated placeholder suggestions */
+      .search-placeholder-hint {
+        position: absolute; left: 38px; top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.83rem; color: var(--text-muted);
+        pointer-events: none;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+      .hint-text {
+        display: inline-block;
+        animation: hintCycle 12s ease infinite;
+      }
+      @keyframes hintCycle {
+        0%, 18%   { opacity: 1; transform: translateY(0); }
+        20%, 22%  { opacity: 0; transform: translateY(-8px); }
+        24%       { opacity: 0; transform: translateY(8px); }
+        26%, 44%  { opacity: 1; transform: translateY(0); }
+        46%, 48%  { opacity: 0; transform: translateY(-8px); }
+        50%       { opacity: 0; transform: translateY(8px); }
+        52%, 70%  { opacity: 1; transform: translateY(0); }
+        72%, 74%  { opacity: 0; transform: translateY(-8px); }
+        76%       { opacity: 0; transform: translateY(8px); }
+        78%, 96%  { opacity: 1; transform: translateY(0); }
+        98%, 100% { opacity: 0; transform: translateY(-8px); }
+      }
+
       .search-count {
         font-size: 0.68rem; font-weight: 500; color: var(--text-muted);
         white-space: nowrap; flex-shrink: 0; transition: opacity 0.2s;
@@ -144,6 +212,34 @@
         padding: 3px 8px; outline: none; cursor: pointer; transition: all 0.15s;
       }
       .sort-select:hover, .sort-select:focus { border-color: var(--border-accent); color: var(--text); }
+
+      /* ─── AI SEARCH RESULT BANNER ─── */
+      .ai-result-banner {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 14px; border-radius: 10px;
+        background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(167,139,250,0.04));
+        border: 1px solid rgba(167,139,250,0.15);
+        margin-bottom: 16px;
+        animation: bannerIn 0.3s ease;
+      }
+      @keyframes bannerIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .ai-result-icon {
+        width: 28px; height: 28px; border-radius: 7px;
+        background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.2);
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        font-size: 0.85rem;
+      }
+      .ai-result-text { flex: 1; }
+      .ai-result-title { font-size: 0.75rem; font-weight: 600; color: var(--ai-color); margin-bottom: 2px; }
+      .ai-result-sub { font-size: 0.68rem; color: var(--text-muted); }
+      .ai-result-count {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 1.4rem; letter-spacing: 2px; color: var(--ai-color);
+        line-height: 1;
+      }
 
       /* ─── SETTINGS PANEL ─── */
       .settings-panel {
@@ -296,6 +392,20 @@
       .cbadge-type { background: rgba(255,255,255,0.15); color: #fff; }
       .cbadge-rating { background: rgba(245,197,24,0.15); color: var(--gold); border: 1px solid rgba(245,197,24,0.2); }
       .cbadge-year { background: rgba(100,200,255,0.12); color: #64c8ff; border: 1px solid rgba(100,200,255,0.2); }
+
+      /* AI score badge on card */
+      .card-ai-score {
+        position: absolute; top: 8px; left: 8px; z-index: 4;
+        font-size: 0.58rem; font-weight: 800;
+        background: linear-gradient(135deg, rgba(167,139,250,0.9), rgba(139,92,246,0.9));
+        color: #fff; padding: 2px 7px; border-radius: 99px;
+        letter-spacing: 0.4px;
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(167,139,250,0.4);
+        opacity: 0; transition: opacity 0.2s;
+      }
+      .card:hover .card-ai-score { opacity: 1; }
+
       .card-play {
         position: absolute; top: 50%; left: 50%; z-index: 2;
         transform: translate(-50%,-50%) scale(0.6);
@@ -334,6 +444,30 @@
       .state-icon { font-size: 3rem; }
       .state-title { font-size: 1rem; font-weight: 600; color: var(--text-dim); }
       .state-sub { font-size: 0.825rem; }
+
+      /* AI empty state */
+      .ai-empty-state {
+        display: flex; flex-direction: column; align-items: center;
+        padding: 60px 20px; gap: 16px; text-align: center;
+      }
+      .ai-empty-icon {
+        width: 64px; height: 64px; border-radius: 16px;
+        background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.15);
+        display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+      }
+      .ai-empty-title { font-size: 1rem; font-weight: 600; color: var(--text-dim); }
+      .ai-empty-sub { font-size: 0.8rem; color: var(--text-muted); max-width: 320px; line-height: 1.6; }
+      .ai-suggestions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+      .ai-suggestion-chip {
+        padding: 6px 14px; border-radius: 99px;
+        background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.15);
+        color: var(--ai-color); font-size: 0.72rem; font-weight: 600;
+        cursor: pointer; transition: all 0.15s;
+      }
+      .ai-suggestion-chip:hover {
+        background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.3);
+      }
+
       .err-box {
         background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09);
         border-radius: 10px; padding: 16px 18px; color: #aaa;
@@ -402,6 +536,7 @@
       .mtag-rating { background: rgba(245,197,24,0.1); color: var(--gold); border: 1px solid rgba(245,197,24,0.15); }
       .mtag-year { background: rgba(100,200,255,0.1); color: #64c8ff; border: 1px solid rgba(100,200,255,0.15); }
       .mtag-region { background: rgba(100,255,150,0.1); color: #64ff96; border: 1px solid rgba(100,255,150,0.15); font-size: 0.6rem; }
+      .mtag-ai { background: rgba(167,139,250,0.1); color: var(--ai-color); border: 1px solid rgba(167,139,250,0.15); }
       .moverview { font-size: 0.84rem; font-weight: 400; color: var(--text-dim); line-height: 1.65; margin-bottom: 20px; font-style: italic; }
       .mmeta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
       .mmeta-item { display: flex; flex-direction: column; gap: 2px; }
@@ -427,8 +562,6 @@
       }
       .prow:hover { border-color: var(--border-accent); background: rgba(255,255,255,0.03); transform: translateX(3px); }
       .prow:last-child { margin-bottom: 0; }
-
-      /* Affiliate highlight */
       .prow.is-affiliate {
         border-color: rgba(245,197,24,0.15);
         background: var(--affiliate-glow);
@@ -449,7 +582,6 @@
         border-top-right-radius: 9px;
         padding: 2px 7px;
       }
-
       .pleft { display: flex; align-items: center; gap: 10px; }
       .pimg {
         width: 32px; height: 32px; border-radius: 6px; object-fit: cover;
@@ -510,8 +642,7 @@
     <script type="text/babel">
       const { useEffect, useState, useRef, useCallback, useMemo } = React;
 
-      /* ─── CONFIG ─── */
-      const API_BASE =  
+      const API_BASE =
         (window.ENV && window.ENV.API_URL)
           ? window.ENV.API_URL
           : 'https://freeflix-production.up.railway.app/';
@@ -529,10 +660,7 @@
         { key: 'other',    label: 'Other' },
       ];
 
-      /* ─── AFFILIATE LINK MANAGEMENT ─── */
-      const AFFILIATE_LINKS = {
-        amazon:  'https://amzn.to/46w62Rg',
-      };
+      const AFFILIATE_LINKS = { amazon: 'https://amzn.to/46w62Rg' };
 
       function getAffiliateLink(providerName) {
         if (!providerName) return null;
@@ -542,11 +670,7 @@
         }
         return null;
       }
-
-      function isAffiliateProvider(providerName) {
-        return getAffiliateLink(providerName) !== null;
-      }
-
+      function isAffiliateProvider(providerName) { return getAffiliateLink(providerName) !== null; }
       function resolveProviderLink(src) {
         const affiliateLink = getAffiliateLink(src.provider);
         if (affiliateLink) return affiliateLink;
@@ -568,6 +692,18 @@
         { code: 'JP',  label: '🇯🇵 Japan' },
       ];
 
+      // AI search placeholder suggestions
+      const AI_SUGGESTIONS = [
+        'dark psychological thriller',
+        'feel-good romantic comedy',
+        'mind-bending sci-fi',
+        'Turkish drama series',
+        'action with comedy',
+        'Oscar winning movies',
+        'anime adventure',
+        '90s classic films',
+      ];
+
       function dedup(arr) {
         const seen = new Set();
         return arr.filter(item => {
@@ -578,7 +714,6 @@
         });
       }
 
-      /* ─── NORMALIZE DATA ─── */
       function normalizeContentItem(item) {
         return {
           id: item.id || item.tmdb_id,
@@ -601,7 +736,6 @@
         };
       }
 
-      /* ─── IMAGE with fallback ─── */
       function PosterImg({ path, name, className, size = 'w500' }) {
         const [failed, setFailed] = useState(false);
         const src = TMDB_IMG(path, size);
@@ -618,11 +752,9 @@
         return <img className={className} src={src} alt={name} onError={() => setFailed(true)} />;
       }
 
-      /* ─── PROVIDER ROW ─── */
       function ProviderRow({ src }) {
         const href = resolveProviderLink(src);
         const isAffiliate = isAffiliateProvider(src.provider);
-
         return (
           <a
             href={href || '#'}
@@ -632,15 +764,9 @@
             onClick={e => { if (!href) e.preventDefault(); }}
           >
             {isAffiliate && <span className="affiliate-badge">Ad</span>}
-
             <div className="pleft">
               {src.provider_image ? (
-                <img
-                  src={TMDB_IMG(src.provider_image, 'w92')}
-                  alt={src.provider}
-                  className="pimg"
-                  onError={e => { e.target.style.display = 'none'; }}
-                />
+                <img src={TMDB_IMG(src.provider_image, 'w92')} alt={src.provider} className="pimg" onError={e => { e.target.style.display='none'; }} />
               ) : (
                 <div className="pimg" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.65rem',fontWeight:700,color:'var(--text-muted)'}}>
                   {(src.provider||'?').slice(0,2).toUpperCase()}
@@ -648,7 +774,6 @@
               )}
               <span className="pname">{src.provider}</span>
             </div>
-
             <span className="pwatch">
               {href ? 'Watch' : 'Unavailable'}
               {href && (
@@ -661,18 +786,13 @@
         );
       }
 
-      /* ─── MODAL ─── */
-      function Modal({ item, onClose, profanityFilter }) {
+      function Modal({ item, onClose, profanityFilter, searchQuery }) {
         if (!item) return null;
-
         useEffect(() => {
           const fn = e => { if (e.key === 'Escape') onClose(); };
           document.addEventListener('keydown', fn);
           document.body.style.overflow = 'hidden';
-          return () => {
-            document.removeEventListener('keydown', fn);
-            document.body.style.overflow = '';
-          };
+          return () => { document.removeEventListener('keydown', fn); document.body.style.overflow = ''; };
         }, []);
 
         const grouped = useMemo(() =>
@@ -680,138 +800,64 @@
             const k = src.payment || 'other';
             (acc[k] = acc[k] || []).push(src);
             return acc;
-          }, {}),
-        [item]);
+          }, {}), [item]);
 
         const sections = SECTION_DEFS.filter(s => grouped[s.key]?.length > 0);
         const srcCount = (item.source_info || []).length;
         const displayName = (item.name || '').replace(/_/g, ' ');
-
         const backdropPath = item.backdrop;
         const heroSrc = backdropPath ? TMDB_IMG(backdropPath, 'w1280') : TMDB_IMG(item.image, 'w780');
         const [heroFailed, setHeroFailed] = useState(false);
-
-        const overview = item.overview || null;
-        const genres = item.genres || [];
-        const runtime = item.runtime;
-        const seasons = item.seasons;
-        const year = item.year;
-        const rating = item.rating;
-        const regions = item.regions || [];
-
         const hasAffiliateSource = (item.source_info || []).some(s => isAffiliateProvider(s.provider));
 
         return (
           <div className="mbg" onClick={onClose}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
-              {/* Hero with Backdrop */}
               <div className="mhero">
                 {heroSrc && !heroFailed
                   ? <img src={heroSrc} alt={displayName} onError={() => setHeroFailed(true)} />
-                  : (
-                    <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--surface2)'}}>
+                  : <div style={{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--surface2)'}}>
                       <svg width="48" height="48" viewBox="0 0 24 24" fill="rgba(255,255,255,0.1)">
                         <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/>
                       </svg>
                     </div>
-                  )
                 }
                 <div className="mhero-grad" />
                 <button className="mclose" onClick={onClose} aria-label="Close">✕</button>
               </div>
-
-              {/* Body */}
               <div className="mbody">
                 <h2 className="mtitle">{displayName}</h2>
-
-                {/* Tags with all parameters */}
                 <div className="mtags">
-                  <span className="mtag mtag-type">
-                    {item.type === 'movie' ? '🎬 Movie' : '📺 Series'}
-                  </span>
-                  {rating && (
-                    <span className="mtag mtag-rating">⭐ {parseFloat(rating).toFixed(1)}/5</span>
-                  )}
-                  {year && <span className="mtag mtag-year">📅 {year}</span>}
-                  {srcCount > 0 && (
-                    <span className="mtag" style={{background:'rgba(255,255,255,0.04)',color:'var(--text-muted)',border:'1px solid rgba(255,255,255,0.06)'}}>
-                      {srcCount} source{srcCount !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                  {regions.length > 0 && regions[0] !== 'all' && (
-                    <span className="mtag mtag-region">🌍 {regions.length} region{regions.length !== 1 ? 's' : ''}</span>
-                  )}
+                  <span className="mtag mtag-type">{item.type === 'movie' ? '🎬 Movie' : '📺 Series'}</span>
+                  {item.rating && <span className="mtag mtag-rating">⭐ {parseFloat(item.rating).toFixed(1)}/5</span>}
+                  {item.year && <span className="mtag mtag-year">📅 {item.year}</span>}
+                  {srcCount > 0 && <span className="mtag" style={{background:'rgba(255,255,255,0.04)',color:'var(--text-muted)',border:'1px solid rgba(255,255,255,0.06)'}}>{srcCount} source{srcCount !== 1 ? 's' : ''}</span>}
+                  {searchQuery && <span className="mtag mtag-ai">✦ AI Match</span>}
                 </div>
-
-                {overview && (
+                {item.overview && (
                   <p className="moverview">
-                    {profanityFilter ? overview.replace(/\b(fuck|shit|ass|bitch|damn|crap|bastard|hell)\b/gi, '***') : overview}
+                    {profanityFilter ? item.overview.replace(/\b(fuck|shit|ass|bitch|damn|crap|bastard|hell)\b/gi, '***') : item.overview}
                   </p>
                 )}
-
-                {/* Enhanced metadata section */}
-                {(genres.length > 0 || runtime || seasons || item.original_language) && (
+                {(item.genres?.length > 0 || item.runtime || item.seasons || item.original_language) && (
                   <div className="mmeta">
-                    {genres.length > 0 && (
+                    {item.genres?.length > 0 && (
                       <div className="mmeta-item">
                         <span className="mmeta-key">Genre</span>
-                        <span className="mmeta-val-list">
-                          {genres.slice(0, 5).map((g, i) => (
-                            <span key={i} className="mmeta-badge">{g}</span>
-                          ))}
-                        </span>
+                        <span className="mmeta-val-list">{item.genres.slice(0,5).map((g,i) => <span key={i} className="mmeta-badge">{g}</span>)}</span>
                       </div>
                     )}
-                    {runtime && (
-                      <div className="mmeta-item">
-                        <span className="mmeta-key">Runtime</span>
-                        <span className="mmeta-val">{runtime} min</span>
-                      </div>
-                    )}
-                    {seasons && (
-                      <div className="mmeta-item">
-                        <span className="mmeta-key">Seasons</span>
-                        <span className="mmeta-val">{seasons}</span>
-                      </div>
-                    )}
-                    {item.original_language && (
-                      <div className="mmeta-item">
-                        <span className="mmeta-key">Language</span>
-                        <span className="mmeta-val">{item.original_language.toUpperCase()}</span>
-                      </div>
-                    )}
+                    {item.runtime && <div className="mmeta-item"><span className="mmeta-key">Runtime</span><span className="mmeta-val">{item.runtime} min</span></div>}
+                    {item.seasons && <div className="mmeta-item"><span className="mmeta-key">Seasons</span><span className="mmeta-val">{item.seasons}</span></div>}
+                    {item.original_language && <div className="mmeta-item"><span className="mmeta-key">Language</span><span className="mmeta-val">{item.original_language.toUpperCase()}</span></div>}
                   </div>
                 )}
-
-                {/* Available Regions */}
-                {regions.length > 0 && regions[0] !== 'all' && (
-                  <div className="msec">
-                    <div className="msec-label">Available In</div>
-                    <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
-                      {regions.slice(0, 10).map((region, i) => {
-                        const regionLabel = REGIONS.find(r => r.code === region)?.label || region;
-                        return (
-                          <span key={i} className="mmeta-badge" style={{background:'rgba(100,255,150,0.08)',borderColor:'rgba(100,255,150,0.2)',color:'#64ff96'}}>
-                            {regionLabel}
-                          </span>
-                        );
-                      })}
-                      {regions.length > 10 && <span className="mmeta-badge">+{regions.length - 10} more</span>}
-                    </div>
-                  </div>
-                )}
-
-                {/* Providers */}
                 {sections.length > 0 ? sections.map(({ key, label }) => (
                   <div key={key} className="msec">
                     <div className="msec-label">{label}</div>
                     {grouped[key].map((src, i) => <ProviderRow key={i} src={src} />)}
                   </div>
-                )) : (
-                  <div className="no-src">No streaming sources found for this title</div>
-                )}
-
-                {/* Affiliate disclosure */}
+                )) : <div className="no-src">No streaming sources found for this title</div>}
                 {hasAffiliateSource && (
                   <div className="affiliate-info">
                     <span>ℹ️</span>
@@ -824,91 +870,61 @@
         );
       }
 
-      /* ─── CARD ─── */
-      function Card({ item, index, onClick, cardRef }) {
+      function Card({ item, index, onClick, cardRef, isAiSearch }) {
         const srcCount = (item.source_info || []).length;
         const [imgFailed, setImgFailed] = useState(false);
         const displayName = (item.name || '').replace(/_/g, ' ');
         const imgSrc = TMDB_IMG(item.image);
-
         return (
-          <div
-            className="card"
-            ref={cardRef}
-            onClick={onClick}
-            style={{ animationDelay: `${(index % PER_PAGE) * 0.028}s` }}
-          >
+          <div className="card" ref={cardRef} onClick={onClick} style={{ animationDelay: `${(index % PER_PAGE) * 0.028}s` }}>
             {imgSrc && !imgFailed
               ? <img className="card-img" src={imgSrc} alt={displayName} loading="lazy" onError={() => setImgFailed(true)} />
-              : (
-                <div className="card-img-placeholder">
+              : <div className="card-img-placeholder">
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{opacity:0.25}}>
                     <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7l-4 5h8l-3-4-2 2.5z"/>
                   </svg>
                   <span style={{fontSize:'0.62rem',color:'var(--text-muted)',textAlign:'center',lineHeight:1.3,padding:'0 8px'}}>{displayName}</span>
                 </div>
-              )
             }
             <div className="card-grad" />
             {srcCount > 0 && <div className="card-src-count">{srcCount} src</div>}
+            {isAiSearch && <div className="card-ai-score">✦ AI</div>}
             <div className="card-info">
               <div className="card-name">{displayName}</div>
               <div className="card-badges">
                 <span className="cbadge cbadge-type">{item.type}</span>
-                {item.year && (
-                  <span className="cbadge cbadge-year">📅 {item.year}</span>
-                )}
-                {item.rating && (
-                  <span className="cbadge cbadge-rating">⭐ {parseFloat(item.rating).toFixed(1)}</span>
-                )}
+                {item.year && <span className="cbadge cbadge-year">📅 {item.year}</span>}
+                {item.rating && <span className="cbadge cbadge-rating">⭐ {parseFloat(item.rating).toFixed(1)}</span>}
               </div>
             </div>
             <div className="card-play">
-              <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
+              <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
             </div>
           </div>
         );
       }
 
-      /* ─── SKELETON ─── */
       function Skeletons({ n = PER_PAGE }) {
-        return (
-          <div className="grid">
-            {Array.from({ length: n }).map((_, i) => <div key={i} className="skel" />)}
-          </div>
-        );
+        return <div className="grid">{Array.from({ length: n }).map((_, i) => <div key={i} className="skel" />)}</div>;
       }
 
-      /* ─── SETTINGS PANEL ─── */
       function SettingsPanel({ settings, onChange, onClose }) {
         return (
           <>
             <div className="settings-overlay" onClick={onClose} />
             <div className="settings-panel">
-              <div className="settings-title">
-                Settings
-                <button className="settings-close" onClick={onClose}>✕</button>
-              </div>
-
+              <div className="settings-title">Settings<button className="settings-close" onClick={onClose}>✕</button></div>
               <div className="settings-section">
                 <div className="settings-section-title">Display</div>
                 <div className="settings-row">
                   <div>
                     <div className="settings-row-label">Grid Size</div>
                     <div className="settings-row-sub">Columns per row</div>
-                    <input
-                      type="range" min="3" max="9"
-                      value={settings.gridCols}
-                      onChange={e => onChange('gridCols', Number(e.target.value))}
-                      className="grid-slider"
-                    />
+                    <input type="range" min="3" max="9" value={settings.gridCols} onChange={e => onChange('gridCols', Number(e.target.value))} className="grid-slider" />
                     <div style={{fontSize:'0.68rem',color:'var(--text-muted)',marginTop:4}}>{settings.gridCols} columns</div>
                   </div>
                 </div>
               </div>
-
               <div className="settings-section">
                 <div className="settings-section-title">Content</div>
                 <div className="settings-row">
@@ -916,29 +932,16 @@
                     <div className="settings-row-label">Profanity Filter</div>
                     <div className="settings-row-sub">Censor strong language in descriptions</div>
                   </div>
-                  <div
-                    className={`toggle ${settings.profanityFilter ? 'on' : ''}`}
-                    onClick={() => onChange('profanityFilter', !settings.profanityFilter)}
-                  />
+                  <div className={`toggle ${settings.profanityFilter ? 'on' : ''}`} onClick={() => onChange('profanityFilter', !settings.profanityFilter)} />
                 </div>
               </div>
-
               <div className="settings-section">
                 <div className="settings-section-title">Region</div>
-                <div style={{fontSize:'0.78rem',color:'var(--text-muted)',lineHeight:1.5,marginBottom:4}}>
-                  Filter availability by your region.
-                </div>
-                <select
-                  className="region-select"
-                  value={settings.region}
-                  onChange={e => onChange('region', e.target.value)}
-                >
-                  {REGIONS.map(r => (
-                    <option key={r.code} value={r.code}>{r.label}</option>
-                  ))}
+                <div style={{fontSize:'0.78rem',color:'var(--text-muted)',lineHeight:1.5,marginBottom:4}}>Filter availability by your region.</div>
+                <select className="region-select" value={settings.region} onChange={e => onChange('region', e.target.value)}>
+                  {REGIONS.map(r => <option key={r.code} value={r.code}>{r.label}</option>)}
                 </select>
               </div>
-
               <div className="settings-section">
                 <div className="settings-section-title">About</div>
                 <div className="affiliate-info" style={{marginTop:0}}>
@@ -951,43 +954,31 @@
         );
       }
 
-      /* ─── ROULETTE ─── */
       function RouletteOverlay({ items, onOpen, onClose }) {
         const [pick, setPick] = useState(() => {
           const pool = items.filter(i => i.image);
           return pool[Math.floor(Math.random() * pool.length)];
         });
-
         const spin = () => {
           const pool = items.filter(i => i.image);
           setPick(pool[Math.floor(Math.random() * pool.length)]);
         };
-
-        if (!pick) {
-          return (
-            <div className="roulette-bg" onClick={onClose}>
-              <div style={{color:'var(--text-dim)',textAlign:'center'}}>
-                <div style={{fontSize:'2rem',marginBottom:12}}>🎲</div>
-                <div>Not enough titles loaded yet</div>
-              </div>
+        if (!pick) return (
+          <div className="roulette-bg" onClick={onClose}>
+            <div style={{color:'var(--text-dim)',textAlign:'center'}}>
+              <div style={{fontSize:'2rem',marginBottom:12}}>🎲</div>
+              <div>Not enough titles loaded yet</div>
             </div>
-          );
-        }
-
+          </div>
+        );
         const imgSrc = TMDB_IMG(pick.image, 'w342');
         const displayName = (pick.name || '').replace(/_/g,' ');
-
         return (
           <div className="roulette-bg" onClick={onClose}>
             <div className="roulette-card" onClick={e => e.stopPropagation()}>
-              <div style={{fontSize:'0.7rem',letterSpacing:'3px',textTransform:'uppercase',color:'var(--text-muted)'}}>
-                🎲 Random Pick
-              </div>
+              <div style={{fontSize:'0.7rem',letterSpacing:'3px',textTransform:'uppercase',color:'var(--text-muted)'}}>🎲 Random Pick</div>
               <div className="roulette-poster">
-                {imgSrc
-                  ? <img src={imgSrc} alt={displayName} style={{width:'100%',height:'100%',objectFit:'cover'}} />
-                  : <div style={{width:'100%',height:'100%',background:'var(--surface3)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text-muted)',fontSize:'0.8rem',textAlign:'center',padding:16}}>{displayName}</div>
-                }
+                {imgSrc ? <img src={imgSrc} alt={displayName} style={{width:'100%',height:'100%',objectFit:'cover'}} /> : <div style={{width:'100%',height:'100%',background:'var(--surface3)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text-muted)',fontSize:'0.8rem',textAlign:'center',padding:16}}>{displayName}</div>}
               </div>
               <div className="roulette-title">{displayName}</div>
               <div className="roulette-meta">
@@ -1005,6 +996,21 @@
         );
       }
 
+      /* Animated placeholder component */
+      function AnimatedPlaceholder({ hints, visible }) {
+        const [idx, setIdx] = useState(0);
+        useEffect(() => {
+          const t = setInterval(() => setIdx(i => (i + 1) % hints.length), 3000);
+          return () => clearInterval(t);
+        }, [hints.length]);
+        if (!visible) return null;
+        return (
+          <span className="search-placeholder-hint">
+            <span key={idx} className="hint-text">{hints[idx]}</span>
+          </span>
+        );
+      }
+
       /* ─── APP ─── */
       function FreeFlix() {
         const [items, setItems]             = useState([]);
@@ -1015,21 +1021,15 @@
         const [page, setPage]               = useState(1);
         const [hasMore, setHasMore]         = useState(true);
         const [sources, setSources]         = useState([]);
-
         const [search, setSearch]           = useState('');
         const [debSearch, setDebSearch]     = useState('');
         const [typeFilter, setTypeFilter]   = useState('all');
         const [srcFilter, setSrcFilter]     = useState('all');
         const [sortBy, setSortBy]           = useState('popularity');
-
         const [showSettings, setShowSettings] = useState(false);
         const [showRoulette, setShowRoulette] = useState(false);
-
-        const [settings, setSettings] = useState({
-          profanityFilter: false,
-          gridCols: null,
-          region: 'all',
-        });
+        const [searchFocused, setSearchFocused] = useState(false);
+        const [settings, setSettings] = useState({ profanityFilter: false, gridCols: null, region: 'all' });
 
         const updateSetting = (key, val) => setSettings(prev => ({ ...prev, [key]: val }));
 
@@ -1061,51 +1061,31 @@
         const fetchItems = useCallback((pageNum, append, q) => {
           append ? setLoadingMore(true) : setLoading(true);
           setError(null);
-
           const p = new URLSearchParams({ page: pageNum, limit: PER_PAGE });
           if (q) p.set('search', q);
-
           fetch(`${API_BASE}?${p}`)
-            .then(r => {
-              if (!r.ok) throw new Error(`${r.status}`);
-              return r.json();
-            })
+            .then(r => { if (!r.ok) throw new Error(`${r.status}`); return r.json(); })
             .then(data => {
-              const raw = Array.isArray(data)
-                ? data
-                : Array.isArray(data.content) ? data.content : [];
-
-              // ✨ Normalize all items
+              const raw = Array.isArray(data) ? data : Array.isArray(data.content) ? data.content : [];
               const normalized = raw.map(normalizeContentItem);
               const fresh = dedup(normalized);
-              
               setItems(prev => {
                 const next = append ? dedup([...prev, ...fresh]) : fresh;
                 return next;
               });
-
               if (!append) {
                 const seen = new Set();
                 fresh.forEach(it => (it.source_info || []).forEach(s => seen.add(s.provider)));
                 setSources([...seen].filter(Boolean).sort());
               }
-
               setHasMore(fresh.length === PER_PAGE);
             })
-            .catch(err => {
-              console.error(err);
-              setError('Could not reach the server — please try again.');
-            })
-            .finally(() => {
-              setLoading(false);
-              setLoadingMore(false);
-            });
+            .catch(err => { console.error(err); setError('Could not reach the server — please try again.'); })
+            .finally(() => { setLoading(false); setLoadingMore(false); });
         }, []);
 
         useEffect(() => {
-          setPage(1);
-          setItems([]);
-          setHasMore(true);
+          setPage(1); setItems([]); setHasMore(true);
           fetchItems(1, false, debSearch);
         }, [debSearch, fetchItems]);
 
@@ -1137,33 +1117,24 @@
             }
             return true;
           });
-
-          if (sortBy === 'popularity') {
-            arr = [...arr].sort((a, b) => {
-              const pa = a.popularity ?? a.vote_count ?? 0;
-              const pb = b.popularity ?? b.vote_count ?? 0;
-              return pb - pa;
-            });
-          } else if (sortBy === 'rating') {
-            arr = [...arr].sort((a, b) => (parseFloat(b.rating) ?? 0) - (parseFloat(a.rating) ?? 0));
-          } else if (sortBy === 'year') {
-            arr = [...arr].sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
-          } else if (sortBy === 'az') {
-            arr = [...arr].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-          }
-
+          if (sortBy === 'popularity') arr = [...arr].sort((a, b) => (b.popularity ?? b.vote_count ?? 0) - (a.popularity ?? a.vote_count ?? 0));
+          else if (sortBy === 'rating') arr = [...arr].sort((a, b) => (parseFloat(b.rating) ?? 0) - (parseFloat(a.rating) ?? 0));
+          else if (sortBy === 'year') arr = [...arr].sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
+          else if (sortBy === 'az') arr = [...arr].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
           return arr;
         }, [items, typeFilter, srcFilter, sortBy, settings.region]);
 
         const showEmpty = !loading && !loadingMore && !error && filtered.length === 0;
         const isSearching = debSearch.trim().length > 0;
+        const showPlaceholder = !search && !searchFocused;
 
         const resetToHome = () => {
-          setSearch('');
-          setDebSearch('');
-          setTypeFilter('all');
-          setSrcFilter('all');
-          setSortBy('popularity');
+          setSearch(''); setDebSearch('');
+          setTypeFilter('all'); setSrcFilter('all'); setSortBy('popularity');
+        };
+
+        const handleSuggestionClick = (suggestion) => {
+          setSearch(suggestion);
         };
 
         return (
@@ -1177,18 +1148,24 @@
                   </div>
 
                   <div className="search-wrap">
+                    <svg className="search-icon-left" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                     <input
-                      className="search-input"
+                      className={`search-input${isSearching ? ' ai-active' : ''}`}
                       type="text"
-                      placeholder="Search titles…"
                       value={search}
                       onChange={e => setSearch(e.target.value)}
+                      onFocus={() => setSearchFocused(true)}
+                      onBlur={() => setSearchFocused(false)}
                       autoComplete="off"
                       spellCheck="false"
                     />
-                    <svg className="search-icon" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+                    <AnimatedPlaceholder hints={AI_SUGGESTIONS} visible={showPlaceholder} />
+                    <span className="ai-badge">
+                      <span className="ai-dot" />
+                      AI Search
+                    </span>
                   </div>
 
                   {isSearching && !loading && (
@@ -1200,15 +1177,9 @@
                       <span>🎲</span>
                       <span>Surprise Me</span>
                     </button>
-                    <button
-                      className={`icon-btn ${showSettings ? 'active' : ''}`}
-                      onClick={() => setShowSettings(v => !v)}
-                      title="Settings"
-                    >
+                    <button className={`icon-btn ${showSettings ? 'active' : ''}`} onClick={() => setShowSettings(v => !v)} title="Settings">
                       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
                     </button>
@@ -1216,14 +1187,9 @@
                 </div>
 
                 <div className="filter-bar">
-                  {[
-                    { v: 'all',    l: 'All' },
-                    { v: 'movie',  l: '🎬 Movies' },
-                    { v: 'series', l: '📺 Series' },
-                  ].map(({ v, l }) => (
+                  {[{v:'all',l:'All'},{v:'movie',l:'🎬 Movies'},{v:'series',l:'📺 Series'}].map(({ v, l }) => (
                     <button key={v} className={`fbtn ${typeFilter === v ? 'on' : ''}`} onClick={() => setTypeFilter(v)}>{l}</button>
                   ))}
-
                   {sources.length > 0 && (
                     <>
                       <div className="fsep" />
@@ -1233,7 +1199,6 @@
                       ))}
                     </>
                   )}
-
                   <div className="sort-label" style={{marginLeft:'auto'}}>
                     Sort
                     <select className="sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
@@ -1248,6 +1213,19 @@
             </header>
 
             <main id="main" style={{ paddingTop: headerH + 16 }}>
+
+              {/* AI Result Banner */}
+              {isSearching && !loading && filtered.length > 0 && (
+                <div className="ai-result-banner">
+                  <div className="ai-result-icon">✦</div>
+                  <div className="ai-result-text">
+                    <div className="ai-result-title">AI Semantic Search</div>
+                    <div className="ai-result-sub">Results matched by meaning, not just keywords — "{debSearch}"</div>
+                  </div>
+                  <div className="ai-result-count">{filtered.length}</div>
+                </div>
+              )}
+
               {loading && <Skeletons n={PER_PAGE} />}
 
               {error && (
@@ -1270,17 +1248,32 @@
                         index={i}
                         onClick={() => setSelected(item)}
                         cardRef={i === filtered.length - 1 ? lastCardRef : null}
+                        isAiSearch={isSearching}
                       />
                     );
                   })}
                 </div>
               )}
 
-              {showEmpty && (
+              {/* AI Empty State with suggestions */}
+              {showEmpty && isSearching && (
+                <div className="ai-empty-state">
+                  <div className="ai-empty-icon">🔍</div>
+                  <div className="ai-empty-title">No matches found for "{debSearch}"</div>
+                  <div className="ai-empty-sub">Try rephrasing your search. Our AI search works best with descriptive phrases.</div>
+                  <div className="ai-suggestions">
+                    {AI_SUGGESTIONS.slice(0, 5).map(s => (
+                      <button key={s} className="ai-suggestion-chip" onClick={() => handleSuggestionClick(s)}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {showEmpty && !isSearching && (
                 <div className="state-box">
-                  <div className="state-icon">🔍</div>
+                  <div className="state-icon">🎬</div>
                   <div className="state-title">No results found</div>
-                  <div className="state-sub">Try a different search or clear your filters</div>
+                  <div className="state-sub">Try adjusting your filters</div>
                 </div>
               )}
 
@@ -1296,15 +1289,12 @@
                 item={selected}
                 onClose={() => setSelected(null)}
                 profanityFilter={settings.profanityFilter}
+                searchQuery={isSearching ? debSearch : null}
               />
             )}
 
             {showSettings && (
-              <SettingsPanel
-                settings={settings}
-                onChange={updateSetting}
-                onClose={() => setShowSettings(false)}
-              />
+              <SettingsPanel settings={settings} onChange={updateSetting} onClose={() => setShowSettings(false)} />
             )}
 
             {showRoulette && items.length > 0 && (
