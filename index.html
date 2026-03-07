@@ -295,6 +295,7 @@
       .cbadge { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; padding: 2px 6px; border-radius: 3px; }
       .cbadge-type { background: rgba(255,255,255,0.15); color: #fff; }
       .cbadge-rating { background: rgba(245,197,24,0.15); color: var(--gold); border: 1px solid rgba(245,197,24,0.2); }
+      .cbadge-year { background: rgba(100,200,255,0.12); color: #64c8ff; border: 1px solid rgba(100,200,255,0.2); }
       .card-play {
         position: absolute; top: 50%; left: 50%; z-index: 2;
         transform: translate(-50%,-50%) scale(0.6);
@@ -399,12 +400,15 @@
       .mtag { padding: 4px 10px; border-radius: 5px; font-size: 0.68rem; font-weight: 600; }
       .mtag-type { background: rgba(255,255,255,0.1); color: #ddd; }
       .mtag-rating { background: rgba(245,197,24,0.1); color: var(--gold); border: 1px solid rgba(245,197,24,0.15); }
-      .mtag-year { background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid var(--border); }
+      .mtag-year { background: rgba(100,200,255,0.1); color: #64c8ff; border: 1px solid rgba(100,200,255,0.15); }
+      .mtag-region { background: rgba(100,255,150,0.1); color: #64ff96; border: 1px solid rgba(100,255,150,0.15); font-size: 0.6rem; }
       .moverview { font-size: 0.84rem; font-weight: 400; color: var(--text-dim); line-height: 1.65; margin-bottom: 20px; font-style: italic; }
       .mmeta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
       .mmeta-item { display: flex; flex-direction: column; gap: 2px; }
       .mmeta-key { font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
       .mmeta-val { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+      .mmeta-val-list { font-size: 0.8rem; font-weight: 500; color: var(--text); display: flex; flex-wrap: wrap; gap: 4px; }
+      .mmeta-badge { display: inline-block; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12); }
       .msec { margin-bottom: 16px; }
       .msec-label {
         font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
@@ -507,7 +511,7 @@
       const { useEffect, useState, useRef, useCallback, useMemo } = React;
 
       /* ─── CONFIG ─── */
-      const API_BASE =
+      const API_BASE =  
         (window.ENV && window.ENV.API_URL)
           ? window.ENV.API_URL
           : 'https://freeflix-production.up.railway.app/';
@@ -525,25 +529,11 @@
         { key: 'other',    label: 'Other' },
       ];
 
-      /* ─── AFFILIATE LINK YÖNETİMİ ─── */
-      /*
-       * Buraya yeni affiliate linkleri kolayca ekleyebilirsin:
-       *   'provider_adi_küçük_harf': 'https://affiliate-link'
-       *
-       * Eşleştirme: provider adı aşağıdaki key'lerden birini içeriyorsa
-       * ilgili affiliate link otomatik olarak uygulanır.
-       */
+      /* ─── AFFILIATE LINK MANAGEMENT ─── */
       const AFFILIATE_LINKS = {
         amazon:  'https://amzn.to/46w62Rg',
-        // apple:   'https://affiliate.apple.com/...',
-        // disney:  'https://disneyplus.bn5x.net/...',
-        // hulu:    'https://...',
       };
 
-      /**
-       * Bir provider için affiliate link döndürür.
-       * Yoksa null döner.
-       */
       function getAffiliateLink(providerName) {
         if (!providerName) return null;
         const lower = providerName.toLowerCase();
@@ -553,25 +543,13 @@
         return null;
       }
 
-      /**
-       * Provider'ın affiliate olup olmadığını kontrol eder.
-       */
       function isAffiliateProvider(providerName) {
         return getAffiliateLink(providerName) !== null;
       }
 
-      /**
-       * Provider için kullanılacak nihai linki döndürür.
-       * Öncelik sırası:
-       *   1. Affiliate link (varsa, hem gelir sağlar hem de doğru hedefe gider)
-       *   2. provider_url (API'den gelen orijinal link)
-       *   3. src.link (alternatif link alanı)
-       *   4. null (link yok)
-       */
       function resolveProviderLink(src) {
         const affiliateLink = getAffiliateLink(src.provider);
         if (affiliateLink) return affiliateLink;
-
         if (src.provider_url && src.provider_url !== '#') return src.provider_url;
         if (src.link) return src.link;
         return null;
@@ -593,11 +571,34 @@
       function dedup(arr) {
         const seen = new Set();
         return arr.filter(item => {
-          const key = item.id ?? `${item.name}||${item.type}`;
+          const key = item.id ?? item.tmdb_id ?? `${item.name}||${item.type}`;
           if (seen.has(key)) return false;
           seen.add(key);
           return true;
         });
+      }
+
+      /* ─── NORMALIZE DATA ─── */
+      function normalizeContentItem(item) {
+        return {
+          id: item.id || item.tmdb_id,
+          tmdb_id: item.tmdb_id,
+          type: item.type,
+          name: item.name,
+          overview: item.overview,
+          image: item.image,
+          backdrop: item.backdrop || item.backdrop_path,
+          year: item.year,
+          genres: item.genres || [],
+          runtime: item.runtime,
+          seasons: item.seasons,
+          rating: item.rating,
+          popularity: item.popularity,
+          vote_count: item.vote_count,
+          original_language: item.original_language,
+          source_info: item.source_info || [],
+          regions: item.regions || [],
+        };
       }
 
       /* ─── IMAGE with fallback ─── */
@@ -686,22 +687,24 @@
         const srcCount = (item.source_info || []).length;
         const displayName = (item.name || '').replace(/_/g, ' ');
 
-        const backdropPath = item.backdrop || item.backdrop_path;
+        const backdropPath = item.backdrop;
         const heroSrc = backdropPath ? TMDB_IMG(backdropPath, 'w1280') : TMDB_IMG(item.image, 'w780');
         const [heroFailed, setHeroFailed] = useState(false);
 
-        const overview = item.overview || item.description || item.synopsis || null;
+        const overview = item.overview || null;
         const genres = item.genres || [];
         const runtime = item.runtime;
         const seasons = item.seasons;
+        const year = item.year;
+        const rating = item.rating;
+        const regions = item.regions || [];
 
-        /* Amazon affiliate var mı kontrol et — kullanıcıya bilgi ver */
         const hasAffiliateSource = (item.source_info || []).some(s => isAffiliateProvider(s.provider));
 
         return (
           <div className="mbg" onClick={onClose}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
-              {/* Hero */}
+              {/* Hero with Backdrop */}
               <div className="mhero">
                 {heroSrc && !heroFailed
                   ? <img src={heroSrc} alt={displayName} onError={() => setHeroFailed(true)} />
@@ -721,16 +724,22 @@
               <div className="mbody">
                 <h2 className="mtitle">{displayName}</h2>
 
+                {/* Tags with all parameters */}
                 <div className="mtags">
                   <span className="mtag mtag-type">
                     {item.type === 'movie' ? '🎬 Movie' : '📺 Series'}
                   </span>
-                  {item.rating && <span className="mtag mtag-rating">⭐ {item.rating}/10</span>}
-                  {item.year && <span className="mtag mtag-year">{item.year}</span>}
+                  {rating && (
+                    <span className="mtag mtag-rating">⭐ {parseFloat(rating).toFixed(1)}/5</span>
+                  )}
+                  {year && <span className="mtag mtag-year">📅 {year}</span>}
                   {srcCount > 0 && (
                     <span className="mtag" style={{background:'rgba(255,255,255,0.04)',color:'var(--text-muted)',border:'1px solid rgba(255,255,255,0.06)'}}>
                       {srcCount} source{srcCount !== 1 ? 's' : ''}
                     </span>
+                  )}
+                  {regions.length > 0 && regions[0] !== 'all' && (
+                    <span className="mtag mtag-region">🌍 {regions.length} region{regions.length !== 1 ? 's' : ''}</span>
                   )}
                 </div>
 
@@ -740,12 +749,17 @@
                   </p>
                 )}
 
-                {(genres.length > 0 || runtime || seasons) && (
+                {/* Enhanced metadata section */}
+                {(genres.length > 0 || runtime || seasons || item.original_language) && (
                   <div className="mmeta">
                     {genres.length > 0 && (
                       <div className="mmeta-item">
                         <span className="mmeta-key">Genre</span>
-                        <span className="mmeta-val">{genres.slice(0,3).join(', ')}</span>
+                        <span className="mmeta-val-list">
+                          {genres.slice(0, 5).map((g, i) => (
+                            <span key={i} className="mmeta-badge">{g}</span>
+                          ))}
+                        </span>
                       </div>
                     )}
                     {runtime && (
@@ -760,9 +774,34 @@
                         <span className="mmeta-val">{seasons}</span>
                       </div>
                     )}
+                    {item.original_language && (
+                      <div className="mmeta-item">
+                        <span className="mmeta-key">Language</span>
+                        <span className="mmeta-val">{item.original_language.toUpperCase()}</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
+                {/* Available Regions */}
+                {regions.length > 0 && regions[0] !== 'all' && (
+                  <div className="msec">
+                    <div className="msec-label">Available In</div>
+                    <div style={{display:'flex',flexWrap:'wrap',gap:'6px'}}>
+                      {regions.slice(0, 10).map((region, i) => {
+                        const regionLabel = REGIONS.find(r => r.code === region)?.label || region;
+                        return (
+                          <span key={i} className="mmeta-badge" style={{background:'rgba(100,255,150,0.08)',borderColor:'rgba(100,255,150,0.2)',color:'#64ff96'}}>
+                            {regionLabel}
+                          </span>
+                        );
+                      })}
+                      {regions.length > 10 && <span className="mmeta-badge">+{regions.length - 10} more</span>}
+                    </div>
+                  </div>
+                )}
+
+                {/* Providers */}
                 {sections.length > 0 ? sections.map(({ key, label }) => (
                   <div key={key} className="msec">
                     <div className="msec-label">{label}</div>
@@ -772,7 +811,7 @@
                   <div className="no-src">No streaming sources found for this title</div>
                 )}
 
-                {/* Affiliate disclosure — yasal zorunluluk */}
+                {/* Affiliate disclosure */}
                 {hasAffiliateSource && (
                   <div className="affiliate-info">
                     <span>ℹ️</span>
@@ -816,7 +855,12 @@
               <div className="card-name">{displayName}</div>
               <div className="card-badges">
                 <span className="cbadge cbadge-type">{item.type}</span>
-                {item.rating && <span className="cbadge cbadge-rating">⭐ {item.rating}</span>}
+                {item.year && (
+                  <span className="cbadge cbadge-year">📅 {item.year}</span>
+                )}
+                {item.rating && (
+                  <span className="cbadge cbadge-rating">⭐ {parseFloat(item.rating).toFixed(1)}</span>
+                )}
               </div>
             </div>
             <div className="card-play">
@@ -948,8 +992,8 @@
               <div className="roulette-title">{displayName}</div>
               <div className="roulette-meta">
                 {pick.type === 'movie' ? '🎬 Movie' : '📺 Series'}
-                {pick.year ? ` · ${pick.year}` : ''}
-                {pick.rating ? ` · ⭐ ${pick.rating}` : ''}
+                {pick.year ? ` · 📅 ${pick.year}` : ''}
+                {pick.rating ? ` · ⭐ ${parseFloat(pick.rating).toFixed(1)}` : ''}
               </div>
               <div className="roulette-actions">
                 <button className="rbtn rbtn-open" onClick={() => { onOpen(pick); onClose(); }}>Open Title</button>
@@ -1031,7 +1075,10 @@
                 ? data
                 : Array.isArray(data.content) ? data.content : [];
 
-              const fresh = dedup(raw);
+              // ✨ Normalize all items
+              const normalized = raw.map(normalizeContentItem);
+              const fresh = dedup(normalized);
+              
               setItems(prev => {
                 const next = append ? dedup([...prev, ...fresh]) : fresh;
                 return next;
@@ -1098,7 +1145,7 @@
               return pb - pa;
             });
           } else if (sortBy === 'rating') {
-            arr = [...arr].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+            arr = [...arr].sort((a, b) => (parseFloat(b.rating) ?? 0) - (parseFloat(a.rating) ?? 0));
           } else if (sortBy === 'year') {
             arr = [...arr].sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
           } else if (sortBy === 'az') {
@@ -1191,6 +1238,8 @@
                     Sort
                     <select className="sort-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
                       <option value="popularity">Popularity</option>
+                      <option value="rating">Rating</option>
+                      <option value="year">Year</option>
                       <option value="az">A–Z</option>
                     </select>
                   </div>
@@ -1213,7 +1262,7 @@
               {!loading && !error && filtered.length > 0 && (
                 <div className="grid">
                   {filtered.map((item, i) => {
-                    const key = item.id ?? `${item.name}||${item.type}`;
+                    const key = item.id ?? item.tmdb_id ?? `${item.name}||${item.type}`;
                     return (
                       <Card
                         key={key}
